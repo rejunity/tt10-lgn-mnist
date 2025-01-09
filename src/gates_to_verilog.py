@@ -10,9 +10,10 @@ import numpy as np
 #                     "connections.B" : model.connections[1].cpu().numpy() }
 #     np.savez(npz_fname, **numpy_dict)
 
-
 EXPANDED_VERILOG = False
 # EXPANDED_VERILOG = True
+
+MAX_LAYERS = -1
 
 def load_npz_file(file_name):
     if not file_name.endswith('.npz'):
@@ -54,6 +55,13 @@ def generate_verilog(global_inputs, gates, conn_a, conn_b):
     body = ""
     gate_idx = 0
     assert len(gates) == len(conn_a) == len(conn_b)
+    if MAX_LAYERS > 0 and len(gates) > MAX_LAYERS:
+        layers_to_cut = len(gates) - MAX_LAYERS
+        print(f"Optional max_layers = {MAX_LAYERS} parameter was specified, cutting the last {layers_to_cut} layer(s)!")
+        gates = gates[:-layers_to_cut]
+        conn_a = conn_a[:-layers_to_cut]
+        conn_b = conn_b[:-layers_to_cut]
+        print(f"There are {len(gates)} layers after cut.")
     for layer_idx, layer_gates, layer_conn_a, layer_conn_b in zip(range(len(gates)), gates, conn_a, conn_b):
         if layer_idx > 0:
             decl += f"    wire [{len(gates[layer_idx-1])}:0] layer_{layer_idx-1};\n"
@@ -128,12 +136,14 @@ endmodule
 ###########################################################################################
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print("Usage: python load_npz_file.py <input_npz_file_name> <output_verilog_file_name>")
+    if len(sys.argv) < 3:
+        print("Usage: python load_npz_file.py <input_npz_file_name> <output_verilog_file_name> (optional: <max_layers>)")
         sys.exit(1)
 
     npz_file_name = sys.argv[1]
     verilog_file_name = sys.argv[2]
+    if len(sys.argv) > 3:
+        MAX_LAYERS = int(sys.argv[3])
 
     try:
         data = load_npz_file(npz_file_name)
