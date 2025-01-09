@@ -2,6 +2,15 @@ import sys
 import os
 import numpy as np
 
+# def save(model, npz_fname):
+#     gate_types = [torch.argmax(layer.w.data, dim=0) for layer in model.layers];
+#     gate_types = torch.stack(gate_types, dim=0).cpu().numpy()
+#     numpy_dict = {  "gate_types" : gate_types,
+#                     "connections.A" : model.connections[0].cpu().numpy(),
+#                     "connections.B" : model.connections[1].cpu().numpy() }
+#     np.savez(npz_fname, **numpy_dict)
+
+
 EXPANDED_VERILOG = False
 # EXPANDED_VERILOG = True
 
