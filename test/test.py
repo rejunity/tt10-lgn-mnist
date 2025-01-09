@@ -22,10 +22,16 @@ X = \
  [0, 1] * 128,
  [1] * 256]
 
+# Y = \
+# [[1832],
+#  [1785],
+#  [1773]] # 24K gates
+
 Y = \
-[[1832],
- [1785],
- [1773]]
+[[1996],
+ [1978],
+ [1988]] # 20K gates
+
 
 def split_array(lst, chunk_size=8):
     return [lst[i:i + chunk_size] for i in range(0, len(lst), chunk_size)]
