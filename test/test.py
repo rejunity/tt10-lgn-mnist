@@ -27,12 +27,17 @@ X = \
 #  [1785],
 #  [1773]] # 24K gates
 
+# Y = \
+# [[1996],
+#  [1978],
+#  [1988]] # 20K gates
+
 Y = \
-[[1996],
- [1978],
- [1988]] # 20K gates
+[[2007],
+ [2005],
+ [2014]] # 16K gates
 
-
+ 
 def split_array(lst, chunk_size=8):
     return [lst[i:i + chunk_size] for i in range(0, len(lst), chunk_size)]
 
