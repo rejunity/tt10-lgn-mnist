@@ -35,8 +35,8 @@ module tt_um_rejunity_lgn_mnist (
   localparam INPUTS  = 256;
   localparam OUTPUTS = 4000;
   always @(posedge clk) begin : set_inputs
-    if (~uio_in[7])
-      x <= {x[INPUTS-8:0], ui_in[7:0]};
+    // if (~uio_in[7])
+    x <= {x[INPUTS-8:0], ui_in[7:0]};
   end
 
   reg   [INPUTS-1:0] x;

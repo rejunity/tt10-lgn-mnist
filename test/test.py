@@ -89,6 +89,6 @@ async def test_project(dut):
             await ClockCycles(dut.clk, 1)
 
         dut.uio_in.value = 128
-        await ClockCycles(dut.clk, 10)
+        await ClockCycles(dut.clk, 1)
 
         assert_output(dut, y)
