@@ -5,10 +5,10 @@ project:
   discord:      "rzioma"      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
   description:  "Experiment with Deep Differential Logic Networks"      # One line description of what your project does
   language:     "Verilog" # other examples include SystemVerilog, Amaranth, VHDL, etc
-  clock_hz:     0       # Clock frequency in Hz (or 0 if not applicable)
+  clock_hz:     1000000       # Clock frequency in Hz (or 0 if not applicable)
 
   # How many tiles your design occupies? A single tile is about 167x108 uM.
-  tiles: "1x2"          # Valid values: 1x1, 1x2, 2x2, 3x2, 4x2, 6x2 or 8x2
+  tiles: "8x2"          # Valid values: 1x1, 1x2, 2x2, 3x2, 4x2, 6x2 or 8x2
 
   # Your top module name must start with "tt_um_". Make it unique by including your github username:
   top_module:  "tt_um_rejunity_lgn_mnist"
@@ -23,14 +23,14 @@ project:
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 pinout:
   # Inputs
-  ui[0]: "A"
-  ui[1]: "B"
-  ui[2]: ""
-  ui[3]: ""
-  ui[4]: ""
-  ui[5]: ""
-  ui[6]: ""
-  ui[7]: ""
+  ui[0]: "Shift-in 8-bit input packet (LSB)"
+  ui[1]: "Shift-in 8-bit input packet"
+  ui[2]: "Shift-in 8-bit input packet"
+  ui[3]: "Shift-in 8-bit input packet"
+  ui[4]: "Shift-in 8-bit input packet"
+  ui[5]: "Shift-in 8-bit input packet"
+  ui[6]: "Shift-in 8-bit input packet"
+  ui[7]: "Shift-in 8-bit input packet (MSB)"
 
   # Outputs
   uo[0]: "TO DO"
@@ -50,7 +50,7 @@ pinout:
   uio[4]: "TO DO"
   uio[5]: "TO DO"
   uio[6]: "TO DO"
-  uio[7]: "TO DO"
+  uio[7]: "Pause input"
 
 # Do not change!
 yaml_version: 6
