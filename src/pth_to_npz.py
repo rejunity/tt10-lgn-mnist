@@ -3,6 +3,8 @@ import numpy as np
 import sys
 import os
 
+# Reference for network training: https://gist.github.com/rejunity/bff3857ce1fad9f11fbfed0db0f2bbc8
+
 if len(sys.argv) != 2 and len(sys.argv) != 3:
     print("Usage: python load_npz_file.py <input_npz_file_name> <output_verilog_file_name>")
     sys.exit(1)

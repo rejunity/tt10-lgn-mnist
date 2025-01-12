@@ -37,12 +37,20 @@ X = \
 #  [2005],
 #  [2014]] # 16K gates
 
-Y = \
-[[1968],
- [1983],
- [2015]] # 12K gates
+# Y = \
+# [[1968],
+#  [1983],
+#  [2015]] # 12K gates
 
  
+Y = \
+[[ 134],
+ [ 133],
+ [ 131]] # ../src/test_rnd_d0r1_8x256_256i_256o.v
+
+
+
+
 def split_array(lst, chunk_size=8):
     return [lst[i:i + chunk_size] for i in range(0, len(lst), chunk_size)]
 
