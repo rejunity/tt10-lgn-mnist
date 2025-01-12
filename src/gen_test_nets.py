@@ -3,6 +3,8 @@ import numpy as np
 GATE_TYPES = 16
 GATE_XOR = 0b0110
 
+np.random.seed(1337)
+
 def net(layer_count, gates_per_layer, connection_dispersions = (0,0), connection_rolls = (0,1)):
     def connect(input_count, output_count, dispersion, roll):
         assert dispersion < output_count
@@ -75,3 +77,7 @@ save("test_xor_d1r1_8x256_256i_256o.npz", np.full_like(model[0], GATE_XOR), mode
 model = net(8, 256, connection_dispersions=(4,4), connection_rolls=(0,1))
 save("test_rnd_d4r1_8x256_256i_256o.npz", *model)
 save("test_xor_d4r1_8x256_256i_256o.npz", np.full_like(model[0], GATE_XOR), model[1])
+
+model = net(8, 256, connection_dispersions=(16,16), connection_rolls=(0,1))
+save("test_rnd_d16r1_8x256_256i_256o.npz", *model)
+save("test_xor_d16r1_8x256_256i_256o.npz", np.full_like(model[0], GATE_XOR), model[1])
