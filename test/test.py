@@ -59,10 +59,16 @@ X = \
 #  [ 136],
 #  [ 136]] # ../src/test_rnd_d0r4_8x256_256i_256o.v
 
+# Y = \
+# [[ 121],
+#  [ 126],
+#  [ 137]] # ../src/test_rnd_d4r1_8x256_256i_256o.v
+
 Y = \
-[[ 121],
- [ 126],
- [ 137]] # ../src/test_rnd_d4r1_8x256_256i_256o.v
+[[ 126],
+ [ 119],
+ [ 124]] # ../src/test_rnd_d16r1_8x256_256i_256o.v
+
 
 def split_array(lst, chunk_size=8):
     return [lst[i:i + chunk_size] for i in range(0, len(lst), chunk_size)]
