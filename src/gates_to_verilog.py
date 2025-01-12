@@ -48,7 +48,7 @@ def op(gate_type, A, B):
         f"1'b1"
     ][gate_type]
 
-def generate_verilog(global_inputs, gates, conn_a, conn_b):
+def generate_verilog(npz_file_name, global_inputs, gates, conn_a, conn_b):
     global_outputs = len(gates[-1])
 
     decl = ""
@@ -90,7 +90,7 @@ def generate_verilog(global_inputs, gates, conn_a, conn_b):
                 body += f"    assign {output}[{out_idx}] = {op(gate, f'{input}[{a}]', f'{input}[{b}]')}; \n"
                 gate_idx += 1
 
-    verilog = ""
+    verilog = f"// Generated from: {npz_file_name}"
     if EXPANDED_VERILOG:
         verilog += f"""
 module logic_gate (
@@ -165,7 +165,7 @@ if __name__ == "__main__":
         conn_b = np.vstack((np.ones (len(gates[0]), dtype=conn_b.dtype), conn_b))
     input_count = np.max([np.max(conn_a[0,:]), np.max(conn_b[0,:])]) + 1
 
-    verilog = generate_verilog(input_count, gates, conn_a, conn_b)
+    verilog = generate_verilog(npz_file_name, input_count, gates, conn_a, conn_b)
 
     with open(verilog_file_name, "w") as f:
         f.write(verilog)
