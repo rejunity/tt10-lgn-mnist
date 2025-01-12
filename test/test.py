@@ -43,12 +43,15 @@ X = \
 #  [2015]] # 12K gates
 
  
+# Y = \
+# [[ 134],
+#  [ 133],
+#  [ 131]] # ../src/test_rnd_d0r1_8x256_256i_256o.v
+
 Y = \
-[[ 134],
- [ 133],
- [ 131]] # ../src/test_rnd_d0r1_8x256_256i_256o.v
-
-
+[[   0],
+ [   0],
+ [   0]] # ../src/test_XOR_d0r1_8x256_256i_256o.v
 
 
 def split_array(lst, chunk_size=8):
