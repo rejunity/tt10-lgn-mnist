@@ -50,21 +50,17 @@ def save(npz_file_name, gates, connections):
                     "connections.B" : connections[1] }
     np.savez(npz_file_name, **numpy_dict)
 
-model = net(3, 15, connection_dispersions=(0,0), connection_rolls=(0,1))
-save("test_rnd_d0r1_3x15_15i_15o.npz", *model)
-save("test_xor_d0r1_3x15_15i_15o.npz", np.full_like(model[0], GATE_XOR), model[1])
+# model = net(3, 15, connection_dispersions=(0,0), connection_rolls=(0,1))
+# save("test_rnd_d0r1_3x15_15i_15o.npz", *model)
+# save("test_xor_d0r1_3x15_15i_15o.npz", np.full_like(model[0], GATE_XOR), model[1])
 
 model = net(8, 256, connection_dispersions=(0,0), connection_rolls=(0,1))
 save("test_rnd_d0r1_8x256_256i_256o.npz", *model)
 save("test_xor_d0r1_8x256_256i_256o.npz", np.full_like(model[0], GATE_XOR), model[1])
 
-model = net(8, 256, connection_dispersions=(0,0), connection_rolls=(0,2))
-save("test_rnd_d0r2_8x256_256i_256o.npz", *model)
-save("test_xor_d0r2_8x256_256i_256o.npz", np.full_like(model[0], GATE_XOR), model[1])
-
-model = net(8, 256, connection_dispersions=(0,0), connection_rolls=(0,3))
-save("test_rnd_d0r3_8x256_256i_256o.npz", *model)
-save("test_xor_d0r3_8x256_256i_256o.npz", np.full_like(model[0], GATE_XOR), model[1])
+# model = net(8, 256, connection_dispersions=(0,0), connection_rolls=(0,2))
+# save("test_rnd_d0r2_8x256_256i_256o.npz", *model)
+# save("test_xor_d0r2_8x256_256i_256o.npz", np.full_like(model[0], GATE_XOR), model[1])
 
 model = net(8, 256, connection_dispersions=(0,0), connection_rolls=(0,4))
 save("test_rnd_d0r4_8x256_256i_256o.npz", *model)
