@@ -1,4 +1,4 @@
-
+// Generated from: test_xor_d0r1_8x256_256i_256o.npz
 module net (
     input wire  [255:0] in,
     output wire [255:0] out

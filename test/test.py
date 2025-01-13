@@ -44,10 +44,10 @@ X = \
 
 
 ############################## TEST NETS
-Y = \
-[[   0],
- # [   126],
- [   0]] # ../src/test_XOR_...v
+# Y = \
+# [[   0],
+#  # [   126],
+#  [   0]] # ../src/test_XOR_...v
  
 # Y = \
 # [[ 134],
@@ -73,6 +73,10 @@ Y = \
 # [[ 119],
 #  [ 125],
 #  [ 113]] # ../src/test_rnd_d16r1_8x256_256i_256o.v
+
+Y = \
+[[   484],
+ [   493]] # ../src/test_rnd_d04r01_8x1024_256i_1024o.v
 
 def split_array(lst, chunk_size=8):
     return [lst[i:i + chunk_size] for i in range(0, len(lst), chunk_size)]
