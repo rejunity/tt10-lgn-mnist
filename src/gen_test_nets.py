@@ -3,9 +3,9 @@ import numpy as np
 GATE_TYPES = 16
 GATE_XOR = 0b0110
 
-np.random.seed(1337)
-
 def net(layer_count, gates_per_layer, connection_dispersions = (0,0), connection_rolls = (0,1), input_count=-1):
+    np.random.seed(1337)
+    
     def connect(input_count, output_count, dispersion, roll):
         assert dispersion < output_count
         assert abs(roll) < output_count
