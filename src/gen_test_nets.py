@@ -133,3 +133,9 @@ save("test_xor_d04r1_8x1024_256i_1024o.npz", np.full_like(model[0], GATE_XOR), m
 model = net(8, 1024, connection_dispersions=(16,16), connection_rolls=(0,1), input_count=256)
 save("test_rnd_d16r1_8x1024_256i_1024o.npz", *model)
 save("test_xor_d16r1_8x1024_256i_1024o.npz", np.full_like(model[0], GATE_XOR), model[1])
+
+model = net(8, 2048, connection_dispersions=(16,16), connection_rolls=(0,1), input_count=256)
+save("test_rnd_d16r1_8x2048_256i_1024o.npz", *model)
+
+model = net(4, 4096, connection_dispersions=(16,16), connection_rolls=(0,1), input_count=256)
+save("test_rnd_d16r1_4x2048_256i_1024o.npz", *model)
