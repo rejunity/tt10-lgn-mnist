@@ -51,7 +51,7 @@ X = \
 
 Y = \
 [[   0],
- [   256]] # ../src/test_OR_...v
+ [   256]] # ../src/test_OR_...v, ../src/test_AND_...v
  
 # Y = \
 # [[ 134],
