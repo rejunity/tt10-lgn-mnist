@@ -48,6 +48,10 @@ X = \
 # [[   0],
 #  # [   126],
 #  [   0]] # ../src/test_XOR_...v
+
+Y = \
+[[   0],
+ [   256]] # ../src/test_OR_...v
  
 # Y = \
 # [[ 134],
@@ -78,9 +82,9 @@ X = \
 # [[   484],
 #  [   493]] # ../src/test_rnd_d04r01_8x1024_256i_1024o.v
 
-Y = \
-[[   524],
- [   527]] # ../src/test_rnd_d16r01_8x1024_256i_1024o.v
+# Y = \
+# [[   524],
+#  [   527]] # ../src/test_rnd_d16r01_8x1024_256i_1024o.v
 
 def split_array(lst, chunk_size=8):
     return [lst[i:i + chunk_size] for i in range(0, len(lst), chunk_size)]

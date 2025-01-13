@@ -1,6 +1,8 @@
 import numpy as np
 
 GATE_TYPES = 16
+GATE_OR  = 0b0111
+GATE_AND = 0b0001
 GATE_XOR = 0b0110
 
 def net(layer_count, gates_per_layer, connection_dispersions = (0,0), connection_rolls = (0,1), input_count=-1):
@@ -62,6 +64,7 @@ def save(npz_file_name, gates, connections):
 model = net(8, 256, connection_dispersions=(0,0), connection_rolls=(0,1))
 save("test_rnd_d0r1_8x256_256i_256o.npz", *model)
 save("test_xor_d0r1_8x256_256i_256o.npz", np.full_like(model[0], GATE_XOR), model[1])
+save("test_or_d0r1_8x256_256i_256o.npz",  np.full_like(model[0], GATE_OR ), model[1])
 
 # model = net(8, 256, connection_dispersions=(0,0), connection_rolls=(0,2))
 # save("test_rnd_d0r2_8x256_256i_256o.npz", *model)
@@ -69,19 +72,20 @@ save("test_xor_d0r1_8x256_256i_256o.npz", np.full_like(model[0], GATE_XOR), mode
 
 model = net(8, 256, connection_dispersions=(0,0), connection_rolls=(0,4))
 save("test_rnd_d0r4_8x256_256i_256o.npz", *model)
-save("test_xor_d0r4_8x256_256i_256o.npz", np.full_like(model[0], GATE_XOR), model[1])
+#save("test_xor_d0r4_8x256_256i_256o.npz", np.full_like(model[0], GATE_XOR), model[1])
 
 model = net(8, 256, connection_dispersions=(1,1), connection_rolls=(0,1))
 save("test_rnd_d1r1_8x256_256i_256o.npz", *model)
-save("test_xor_d1r1_8x256_256i_256o.npz", np.full_like(model[0], GATE_XOR), model[1])
+#save("test_xor_d1r1_8x256_256i_256o.npz", np.full_like(model[0], GATE_XOR), model[1])
 
 model = net(8, 256, connection_dispersions=(4,4), connection_rolls=(0,1))
 save("test_rnd_d4r1_8x256_256i_256o.npz", *model)
-save("test_xor_d4r1_8x256_256i_256o.npz", np.full_like(model[0], GATE_XOR), model[1])
+#save("test_xor_d4r1_8x256_256i_256o.npz", np.full_like(model[0], GATE_XOR), model[1])
 
 model = net(8, 256, connection_dispersions=(16,16), connection_rolls=(0,1))
 save("test_rnd_d16r1_8x256_256i_256o.npz", *model)
 save("test_xor_d16r1_8x256_256i_256o.npz", np.full_like(model[0], GATE_XOR), model[1])
+save("test_or_d16r1_8x256_256i_256o.npz",  np.full_like(model[0], GATE_OR ), model[1])
 
 model = net(8, 256, connection_dispersions=(32,32), connection_rolls=(0,1))
 save("test_rnd_d32r1_8x256_256i_256o.npz", *model)
