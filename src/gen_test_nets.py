@@ -104,7 +104,7 @@ save("test_rnd_d1r1_8x256_256i_256o.npz", *model)
 
 model = net(8, 256, connection_dispersions=(4,4), connection_rolls=(0,1))
 save("test_rnd_d4r1_8x256_256i_256o.npz", *model)
-#save("test_xor_d4r1_8x256_256i_256o.npz", np.full_like(model[0], GATE_XOR), model[1])
+save("test_xor_clamped4r1_8x256_256i_256o.npz", np.full_like(model[0], GATE_XOR), model[1])
 
 model = net(8, 256, connection_dispersions=(8,8), connection_rolls=(0,1), limit_by="clamp")
 save("test_xor_clamped8r1_8x256_256i_256o.npz", np.full_like(model[0], GATE_XOR), model[1])
