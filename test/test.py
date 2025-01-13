@@ -85,10 +85,13 @@ X = \
 # [[   521],
 #  [   520]] # ../src/test_rnd_d16r01_8x1024_256i_1024o.v
 
-Y = \
-[[ 1051],
- [ 1046]] # ../src/test_rnd_d16r01_8x2048_256i_1024o.v
+# Y = \
+# [[ 1051],
+#  [ 1046]] # ../src/test_rnd_d16r01_8x2048_256i_1024o.v
 
+Y = \
+[[ 1998],
+ [ 2007]] # ../src/test_rnd_d16r01_4x4096_256i_1024o.v
 
 def split_array(lst, chunk_size=8):
     return [lst[i:i + chunk_size] for i in range(0, len(lst), chunk_size)]

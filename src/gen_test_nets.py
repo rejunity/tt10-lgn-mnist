@@ -138,4 +138,4 @@ model = net(8, 2048, connection_dispersions=(16,16), connection_rolls=(0,1), inp
 save("test_rnd_d16r1_8x2048_256i_1024o.npz", *model)
 
 model = net(4, 4096, connection_dispersions=(16,16), connection_rolls=(0,1), input_count=256)
-save("test_rnd_d16r1_4x2048_256i_1024o.npz", *model)
+save("test_rnd_d16r1_4x4096_256i_1024o.npz", *model)
