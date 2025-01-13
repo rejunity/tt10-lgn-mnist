@@ -13,7 +13,6 @@ pth_file_name = sys.argv[1]
 if len(sys.argv) == 3:
 	npz_file_name = sys.argv[2]
 else:
-	# npz_file_name = pth_file_name.strip(".pth") + ".npz"
 	npz_file_name = os.path.splitext(pth_file_name)[0] + ".npz"
 
 checkpoint = torch.load(pth_file_name, map_location=torch.device('cpu'), weights_only=True)

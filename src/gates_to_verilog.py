@@ -136,12 +136,15 @@ endmodule
 ###########################################################################################
 
 if __name__ == "__main__":
-    if len(sys.argv) < 3:
+    if len(sys.argv) != 2 and len(sys.argv) != 3:
         print("Usage: python load_npz_file.py <input_npz_file_name> <output_verilog_file_name> (optional: <max_layers>)")
         sys.exit(1)
 
     npz_file_name = sys.argv[1]
-    verilog_file_name = sys.argv[2]
+    if len(sys.argv) == 3:
+        verilog_file_name = sys.argv[2]
+    else:
+        verilog_file_name = os.path.splitext(npz_file_name)[0] + ".v"
     if len(sys.argv) > 3:
         MAX_LAYERS = int(sys.argv[3])
 
