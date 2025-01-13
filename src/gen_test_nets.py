@@ -5,7 +5,7 @@ GATE_OR  = 0b0111
 GATE_AND = 0b0001
 GATE_XOR = 0b0110
 
-def net(layer_count, gates_per_layer, connection_dispersions = (0,0), connection_rolls = (0,1), input_count=-1):
+def net(layer_count, gates_per_layer, connection_dispersions = (0,0), connection_rolls = (0,1), input_count=-1, limit_by="reflection"):
     np.random.seed(1337)
     
     def connect(input_count, output_count, dispersion, roll):
@@ -15,6 +15,28 @@ def net(layer_count, gates_per_layer, connection_dispersions = (0,0), connection
         connections = np.linspace(0, input_count-1, num=output_count, dtype=np.int32) # distribute connections evenly
         connections = np.roll(connections, roll)
         connections = connections + noise
+
+        def limit_by_clamp(arr, N, R=0):
+            zero_to_N = np.linspace(0, N-1, num=len(arr), dtype=np.int32)
+
+            # limit by max
+            arr %= N
+
+            # handle negative values
+            mask = arr < 0
+            arr[mask] = N + arr[mask]
+
+            # limit long connections
+            diff = arr - zero_to_N
+            mask = diff >= (N - R)
+            arr[mask] = 0
+            mask = -diff >= (N - R)
+            arr[mask] = N - 1
+
+            assert np.all(arr >= 0)
+            assert np.all(arr <  N)
+            assert np.all(np.abs(arr - zero_to_N) <= R)
+            return arr
 
         def limit_by_reflection(arr, N, R=0):
             zero_to_N = np.linspace(0, N-1, num=len(arr), dtype=np.int32)
@@ -38,7 +60,8 @@ def net(layer_count, gates_per_layer, connection_dispersions = (0,0), connection
             assert np.all(np.abs(arr - zero_to_N) <= R)
             return arr
 
-        return limit_by_reflection(connections, N=input_count, R=abs(roll) + abs(dispersion))
+        return limit_by_reflection(connections, N=input_count, R=abs(roll) + abs(dispersion)) if limit_by.startswith("refl") else \
+               limit_by_clamp     (connections, N=input_count, R=abs(roll) + abs(dispersion))
 
     inputs = [gates_per_layer] * layer_count
     if input_count > 0:
@@ -88,6 +111,9 @@ save("test_rnd_d16r1_8x256_256i_256o.npz", *model)
 save("test_xor_d16r1_8x256_256i_256o.npz", np.full_like(model[0], GATE_XOR), model[1])
 save("test_or_d16r1_8x256_256i_256o.npz",  np.full_like(model[0], GATE_OR ), model[1])
 save("test_and_d16r1_8x256_256i_256o.npz", np.full_like(model[0], GATE_AND), model[1])
+
+model = net(8, 256, connection_dispersions=(16,16), connection_rolls=(0,1), limit_by="clamp")
+save("test_xor_clamped16r1_8x256_256i_256o.npz", np.full_like(model[0], GATE_XOR), model[1])
 
 model = net(8, 256, connection_dispersions=(32,32), connection_rolls=(0,1))
 save("test_rnd_d32r1_8x256_256i_256o.npz", *model)
