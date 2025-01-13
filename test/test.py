@@ -43,6 +43,17 @@ X = \
 #  [2015]] # 12K gates
 
 
+# Y = \
+# [[1968],
+#  [1983],
+#  [2015]] # 12K gates
+
+Y = \
+[[166],
+ [123]] # 8K gates final_20250113-141316_acc4865_seed775741_epochs50_dispersion16_8x1024.v
+
+
+
 ############################## TEST NETS
 # Y = \
 # [[   0],
@@ -89,9 +100,9 @@ X = \
 # [[ 1051],
 #  [ 1046]] # ../src/test_rnd_d16r01_8x2048_256i_1024o.v
 
-Y = \
-[[ 1998],
- [ 2007]] # ../src/test_rnd_d16r01_4x4096_256i_1024o.v
+# Y = \
+# [[ 1998],
+#  [ 2007]] # ../src/test_rnd_d16r01_4x4096_256i_1024o.v
 
 def split_array(lst, chunk_size=8):
     return [lst[i:i + chunk_size] for i in range(0, len(lst), chunk_size)]
