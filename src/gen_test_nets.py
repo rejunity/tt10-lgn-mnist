@@ -67,7 +67,7 @@ def net(layer_count, gates_per_layer, connection_dispersions = (0,0), connection
     if input_count > 0:
         inputs[0] = input_count
 
-    gates = np.random.randint(low=0, high=GATE_TYPES, size=(layer_count, gates_per_layer))
+    gates = np.random.randint(low=1, high=GATE_TYPES-1, size=(layer_count, gates_per_layer)) # exclude constant 0 (0b0000) and contant 1 (0b1111)
     connections_a = [connect(inputs[layer], gates_per_layer, connection_dispersions[0], connection_rolls[0]) for layer in range(layer_count)]
     connections_b = [connect(inputs[layer], gates_per_layer, connection_dispersions[1], connection_rolls[1]) for layer in range(layer_count)]
 
