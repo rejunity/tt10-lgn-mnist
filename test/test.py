@@ -51,9 +51,12 @@ X = \
 # Y = \
 # [[166],
 #  [123]] # 8K gates final_20250113-141316_acc4865_seed775741_epochs50_dispersion16_8x1024.v
+# Y = \
+# [[292],
+#  [181]] # 8K gates final_20250113-143813_acc3391_seed259890_epochs30_dispersion4_8x1024.v
 Y = \
-[[292],
- [181]] # 8K gates final_20250113-143813_acc3391_seed259890_epochs30_dispersion4_8x1024.v
+[[215],
+ [173]] # 8K gates final_20250114-123035_acc5871_seed382310_epochs300_dispersion16_1020-1020-1020-1020-1020-1020-1020-1020.v
 
 
 
