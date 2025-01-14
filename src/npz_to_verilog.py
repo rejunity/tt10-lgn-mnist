@@ -2,6 +2,10 @@ import sys
 import os
 import numpy as np
 
+
+# TODO: Inject additional pass-through (negate / or) gates on the long connections.
+#       Use keep directive to avoid optimisastion by Yosys.
+
 # def save(model, npz_fname):
 #     gate_types = [torch.argmax(layer.w.data, dim=0) for layer in model.layers];
 #     gate_types = torch.stack(gate_types, dim=0).cpu().numpy()
@@ -133,6 +137,32 @@ endmodule
 """
     return verilog
 
+def ascii_graph(values):
+    # Array of characters for tiny histograms
+    histogram_chars = np.array([
+        " ","▁","▂","▃","▄","▅","▆","▇","▒","▓","█" 
+    ])
+    percentages = (values / values.sum()) * 100  # Normalize to 100%
+    indices = (values * (len(histogram_chars) - 2)) // values.sum() + 1
+    indices[percentages < 1] = 0
+    return "".join(histogram_chars[indices]), percentages
+
+def ascii_histogram(values, bins=16):
+    counts, _ = np.histogram(values, bins=bins)
+    return ascii_graph(counts)
+
+def ascii_histogram_compressed(values, bins=64):
+    values = np.hstack([values, 0, 1])
+    values[values >= np.mean(values) * 2] = np.mean(values) * 2
+    if bins > np.max(values):
+        bins = np.max(values) + 1
+    counts, _ = np.histogram(values, bins=bins)
+    # print(len(counts), bins, np.max(values))
+    counts = np.pad(counts, bins-len(counts))
+    # print(counts)
+    # print(len(counts))
+    return ascii_graph(counts)
+
 ###########################################################################################
 
 if __name__ == "__main__":
@@ -161,12 +191,26 @@ if __name__ == "__main__":
     conn_a = data['connections.A']
     conn_b = data['connections.B']
 
+    # for c, a, b in zip(np.abs(conn_b - conn_a), conn_b, conn_a):
+    #     print(c, np.max(c), np.mean(c), np.median(c), ascii_histogram(c)[0])
+
     # inject input connections, if the first connectivity layer is missing
     assert len(conn_a) == len(conn_b)
     if (gates.shape[0] > conn_a.shape[0]):
         conn_a = np.vstack((np.zeros(len(gates[0]), dtype=conn_a.dtype), conn_a))
         conn_b = np.vstack((np.ones (len(gates[0]), dtype=conn_b.dtype), conn_b))
     input_count = np.max([np.max(conn_a[0,:]), np.max(conn_b[0,:])]) + 1
+
+    print()
+    print("Layer statistics:")
+    print("   ","  _ _   ___ _ _ ")
+    print("   ","0&⇒A⇐B⊕||⊕B⇐A⇒&1","   ","0...4..........16..............32.... connection distance .....>64")
+    conn_distance = np.abs(conn_b - conn_a)
+    for i, g, d in zip(range(len(gates)), gates, conn_distance):
+        print(f"{i:3}", ascii_histogram(g)[0], "   ", ascii_histogram_compressed(d)[0])
+        # print(d)
+    print("   ","0&⇒A⇐B⊕||⊕B⇐A⇒&1")
+
 
     verilog = generate_verilog(npz_file_name, input_count, gates, conn_a, conn_b)
 
