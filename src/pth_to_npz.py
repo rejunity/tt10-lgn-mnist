@@ -20,7 +20,7 @@ checkpoint = torch.load(pth_file_name, map_location=torch.device('cpu'), weights
 
 if isinstance(checkpoint, dict):
     connections = checkpoint.pop("connections")
-    layers = [checkpoint[f"layers.{layer_idx}.w"] for layer_idx in range(len(checkpoint))]
+    layers = [checkpoint[f"layers.{i}.w"] for i in range(len([k for k in checkpoint if k.startswith('layers.') and k.endswith('.w')]))]
 
     assert len(connections) == 2
     print("Number of layers: ", len(layers))
