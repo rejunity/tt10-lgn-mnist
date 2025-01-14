@@ -192,9 +192,6 @@ if __name__ == "__main__":
     conn_a = data['connections.A']
     conn_b = data['connections.B']
 
-    # for c, a, b in zip(np.abs(conn_b - conn_a), conn_b, conn_a):
-    #     print(c, np.max(c), np.mean(c), np.median(c), ascii_histogram(c)[0])
-
     # inject input connections, if the first connectivity layer is missing
     assert len(conn_a) == len(conn_b)
     if (gates.shape[0] > conn_a.shape[0]):
@@ -211,7 +208,6 @@ if __name__ == "__main__":
         print(f"{i:3}", ascii_histogram(g)[0], "   ", ascii_histogram_compressed(d)[0])
         # print(d)
     print("   ","0&⇒A⇐B⊕||⊕B⇐A⇒&1")
-
 
     verilog = generate_verilog(npz_file_name, input_count, gates, conn_a, conn_b)
 
