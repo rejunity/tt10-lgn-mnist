@@ -148,6 +148,7 @@ def ascii_graph(values):
     return "".join(histogram_chars[indices]), percentages
 
 def ascii_histogram(values, bins=16):
+    values = np.hstack([values, np.arange(bins)])
     counts, _ = np.histogram(values, bins=bins)
     return ascii_graph(counts)
 
