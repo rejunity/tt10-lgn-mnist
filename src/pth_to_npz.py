@@ -20,6 +20,8 @@ checkpoint = torch.load(pth_file_name, map_location=torch.device('cpu'), weights
 
 if isinstance(checkpoint, dict):
     connections = checkpoint.pop("connections")
+    dataset_input = checkpoint.pop("dataset_input")
+    dataset_output = checkpoint.pop("dataset_output")
     layers = [checkpoint[f"layers.{i}.w"] for i in range(len([k for k in checkpoint if k.startswith('layers.') and k.endswith('.w')]))]
 
     assert len(connections) == 2
@@ -29,22 +31,25 @@ if isinstance(checkpoint, dict):
 
     original_size = np.sum([g.size() for g in gate_types] + [c.size() for c in connections[0]] + [c.size() for c in connections[1]])
 
-    def pad_tensor_array(tensors, padding=0):
-        max_size = max(t.size(0) for t in tensors)
-        padded = [F.pad(t, (0, max_size - t.size(0)), value=padding) for t in tensors]
+    def pad_tensor_array(tensors, new_size, padding=0):
+        padded = [F.pad(t, (0, new_size - t.size(0)), value=padding) for t in tensors]
         return torch.stack(padded, dim=0)
 
-    gate_types = pad_tensor_array(gate_types).cpu().numpy()
-    connections[0] = pad_tensor_array(connections[0]).cpu().numpy()
-    connections[1] = pad_tensor_array(connections[1]).cpu().numpy()
+    max_size = max(t.size(0) for t in gate_types)
+    gate_types = pad_tensor_array(gate_types, max_size).cpu().numpy()
+    connections[0] = pad_tensor_array(connections[0], max_size).cpu().numpy()
+    connections[1] = pad_tensor_array(connections[1], max_size).cpu().numpy()
+    dataset_output = pad_tensor_array(dataset_output, max_size).cpu().numpy()
 
     padded_size = gate_types.size + connections[0].size + connections[1].size 
     if padded_size - original_size > 0:
         print("Number of new null gates & connections added for padding:", padded_size - original_size)
 
-    numpy_dict = {  "gate_types" : gate_types,
+    numpy_dict = {  "gate_types"    : gate_types,
                     "connections.A" : connections[0],
-                    "connections.B" : connections[1] }
+                    "connections.B" : connections[1],
+                    "input"         : dataset_input,
+                    "output"        : dataset_output }
     np.savez(npz_file_name, **numpy_dict)
 
     print("Totoal number of gates in the network:", np.size(gate_types))
