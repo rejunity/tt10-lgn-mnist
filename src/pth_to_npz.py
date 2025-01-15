@@ -39,7 +39,7 @@ if isinstance(checkpoint, dict):
     connections[1] = pad_tensor_array(connections[1]).cpu().numpy()
 
     padded_size = gate_types.size + connections[0].size + connections[1].size 
-    if padded_size > 0:
+    if padded_size - original_size > 0:
         print("Number of new null gates & connections added for padding:", padded_size - original_size)
 
     numpy_dict = {  "gate_types" : gate_types,
