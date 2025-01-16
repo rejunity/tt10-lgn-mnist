@@ -1,4 +1,4 @@
-// Generated from: /Users/rej/Dev/TinyTapeout/tt10-lgn-mnist.git/src/barabasi_20250115-050146_acc8915_seed803984_epochs100_dispersion64_2040-2040-2040-2040-2040-2040-2040-2040.npz
+// Generated from: barabasi_20250115-050146_acc8915_seed803984_epochs100_dispersion64_2040-2040-2040-2040-2040-2040-2040-2040with_dataset.npz
 module net (
     input wire  [255:0] in,
     output wire [2039:0] out
