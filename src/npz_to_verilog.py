@@ -17,6 +17,9 @@ import numpy as np
 EXPANDED_VERILOG = False
 # EXPANDED_VERILOG = True
 
+# RELAY_LONG_CONNECTIONS = False
+RELAY_LONG_CONNECTIONS = 32
+
 MAX_LAYERS = -1
 
 def load_npz_file(file_name):
@@ -80,21 +83,48 @@ def generate_verilog(npz_file_name, global_inputs, gates, conn_a, conn_b):
 
         assert len(layer_gates) == len(layer_conn_a) == len(layer_conn_b)
         body += f"    // Layer {layer_idx} ============================================================\n"
+
+        def setup_inputs(a, b):
+            input_a = f"{input}[{a}]"
+            input_b = f"{input}[{b}]"
+            if RELAY_LONG_CONNECTIONS > 0:
+                relay_count = abs(b - a) // 32
+                for _ in range(relay_count):
+                    input_a = f"far({input_a})"
+                    input_b = f"far({input_b})"
+            return input_a, input_b
+
         if EXPANDED_VERILOG:
             for out_idx, gate, a, b in zip(range(len(layer_gates)), layer_gates, layer_conn_a, layer_conn_b):
+                input_a, input_b = setup_inputs(a, b)
                 body += f"    logic_gate gate_{layer_idx}_{gate_idx} ("
-                body += f"        .A({input}[{a}]),"
-                body += f"        .B({input}[{b}]),"
+                body += f"        .A({input_a}),"
+                body += f"        .B({input_b}),"
                 body += f"        .gate_type(4'd{gate}),"
                 body += f"        .Y({output}[{out_idx}])"
                 body += f"    );\n"
                 gate_idx += 1
         else:
             for out_idx, gate, a, b in zip(range(len(layer_gates)), layer_gates, layer_conn_a, layer_conn_b):
-                body += f"    assign {output}[{out_idx}] = {op(gate, f'{input}[{a}]', f'{input}[{b}]')}; \n"
+                input_a, input_b = setup_inputs(a, b)
+                body += f"    assign {output}[{out_idx}] = {op(gate, f'{input_a}', f'{input_b}')}; \n"
                 gate_idx += 1
 
     verilog = f"// Generated from: {npz_file_name}"
+    if RELAY_LONG_CONNECTIONS > 0:
+        verilog += f"""
+function far;
+    input in;
+    reg intermediate;
+    reg result;
+    begin
+        // Keep attribute prevents Yosys from optimization
+        (* keep = "true" *) intermediate = ~in;
+        (* keep = "true" *) result = ~intermediate;
+        far = result;
+    end
+endfunction """
+
     if EXPANDED_VERILOG:
         verilog += f"""
 module logic_gate (
