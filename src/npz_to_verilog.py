@@ -84,19 +84,25 @@ def generate_verilog(npz_file_name, global_inputs, gates, conn_a, conn_b):
         assert len(layer_gates) == len(layer_conn_a) == len(layer_conn_b)
         body += f"    // Layer {layer_idx} ============================================================\n"
 
-        def setup_inputs(a, b):
+        idx = 0
+        def setup_inputs(body, layer_idx, gate_idx, a, b):
             input_a = f"{input}[{a}]"
             input_b = f"{input}[{b}]"
             if RELAY_LONG_CONNECTIONS > 0:
                 relay_count = abs(b - a) // 32
-                for _ in range(relay_count):
-                    input_a = f"far({input_a})"
-                    input_b = f"far({input_b})"
-            return input_a, input_b
+                for n in range(relay_count):
+                    relay = f"far_{layer_idx}_{gate_idx}_{n}"
+                    body += f"    wire [1:0] {relay};"
+                    body += f"    relay_conn {relay}_a(.in({input_a}), .out({relay}[0]));"
+                    body += f"    relay_conn {relay}_b(.in({input_b}), .out({relay}[1]));"
+                    body += "\n"
+                    input_a = f"{relay}[0]"
+                    input_b = f"{relay}[1]"
+            return body, input_a, input_b
 
         if EXPANDED_VERILOG:
             for out_idx, gate, a, b in zip(range(len(layer_gates)), layer_gates, layer_conn_a, layer_conn_b):
-                input_a, input_b = setup_inputs(a, b)
+                body, input_a, input_b = setup_inputs(body, layer_idx, gate_idx, a, b)
                 body += f"    logic_gate gate_{layer_idx}_{gate_idx} ("
                 body += f"        .A({input_a}),"
                 body += f"        .B({input_b}),"
@@ -106,24 +112,30 @@ def generate_verilog(npz_file_name, global_inputs, gates, conn_a, conn_b):
                 gate_idx += 1
         else:
             for out_idx, gate, a, b in zip(range(len(layer_gates)), layer_gates, layer_conn_a, layer_conn_b):
-                input_a, input_b = setup_inputs(a, b)
+                body, input_a, input_b = setup_inputs(body, layer_idx, gate_idx, a, b)
                 body += f"    assign {output}[{out_idx}] = {op(gate, f'{input_a}', f'{input_b}')}; \n"
                 gate_idx += 1
 
     verilog = f"// Generated from: {npz_file_name}"
     if RELAY_LONG_CONNECTIONS > 0:
         verilog += f"""
-function far;
-    input in;
-    reg intermediate;
-    reg result;
-    begin
-        // Keep attribute prevents Yosys from optimization
-        (* keep = "true" *) intermediate = ~in;
-        (* keep = "true" *) result = ~intermediate;
-        far = result;
-    end
-endfunction """
+module relay_conn (
+    input wire in,
+    output wire out
+);
+    wire tmp, res;
+    `ifdef SIM
+        assign tmp = ~in;
+        assign res = ~tmp;
+    `else
+        /* verilator lint_off PINMISSING */
+        // https://skywater-pdk.readthedocs.io/en/main/contents/libraries/sky130_fd_sc_hd/cells/inv/README.html
+        // (* keep = "true" *) sky130_fd_sc_hd__inv_1 inv_a ( .Y(tmp), .A(in)  );
+        // (* keep = "true" *) sky130_fd_sc_hd__inv_1 inv_b ( .Y(res), .A(tmp) );
+        /* verilator lint_on PINMISSING */
+    `endif
+    assign out = res;
+endmodule """
 
     if EXPANDED_VERILOG:
         verilog += f"""
