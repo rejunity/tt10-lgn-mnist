@@ -63,7 +63,7 @@ X = \
 # [[292],
 #  [181]] # 8K gates final_20250113-143813_acc3391_seed259890_epochs30_dispersion4_8x1024.v
 # Y = \
-# [[215],
+# [[215],   
 #  [173]] # 8K gates final_20250114-123035_acc5871_seed382310_epochs300_dispersion16_1020-1020-1020-1020-1020-1020-1020-1020.v
 # Y = \
 # [[325],
@@ -74,11 +74,13 @@ X = \
 # Y = \
 # [[414],
 #  [423]] # 8K gates barabasi_20250115-080837_acc7913_seed176567_epochs100_dispersion128_1020-1020-1020-1020-1020-1020-1020-1020.v
-Y =        "../src/barabasi_20250115-080837_acc7913_seed176567_epochs100_dispersion128_1020-1020-1020-1020-1020-1020-1020-1020with_dataset.npz"
+# Y =        "../src/barabasi_20250115-080837_acc7913_seed176567_epochs100_dispersion128_1020-1020-1020-1020-1020-1020-1020-1020with_dataset.npz"
 # Y = \
 # [[857],
 #  [942]] # 16K gates barabasi_20250115-050146_acc8915_seed803984_epochs100_dispersion64_2040-2040-2040-2040-2040-2040-2040-2040.v
 # Y =          "../src/barabasi_20250115-050146_acc8915_seed803984_epochs100_dispersion64_2040-2040-2040-2040-2040-2040-2040-2040with_dataset.npz"
+
+Y =        "../src/barabasi_20250116-120423_acc8188_seed673186_epochs50_dsp128_8x1300_b256_lrm10-2with_dataset.npz"
 
 ############################## TEST NETS
 # Y = \
