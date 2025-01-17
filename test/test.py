@@ -84,10 +84,10 @@ X = \
 # 10K gates
 
 # Y =        "../src/barabasi_20250116-110050_acc8484_seed742947_epochs50_dsp128_8x1500_b256_lrm4-4with_dataset.npz"
-# 12K gates
+# 12K gates, Suggested target density: 0.31
 
 Y =        "../src/baralizm_20250116-123948_acc9424_seed1022128_epochs50_dsp128_3x4000_b256_lrm5-1with_dataset.npz"
-# 12K gates
+# 12K gates, Suggested target density: 0.79
 
 ############################## TEST NETS
 # Y = \
