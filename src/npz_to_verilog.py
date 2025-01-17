@@ -119,22 +119,24 @@ def generate_verilog(npz_file_name, global_inputs, gates, conn_a, conn_b):
     verilog = f"// Generated from: {npz_file_name}"
     if RELAY_LONG_CONNECTIONS > 0:
         verilog += f"""
+`ifdef SIM
+module sky130_fd_sc_hd__inv_1 (
+    input wire A,
+    output wire Y
+);
+    assign Y = ~A;
+endmodule
+`endif
 module relay_conn (
     input wire in,
     output wire out
 );
-    wire tmp, res;
-    `ifdef SIM
-        assign tmp = ~in;
-        assign res = ~tmp;
-    `else
-        /* verilator lint_off PINMISSING */
-        // https://skywater-pdk.readthedocs.io/en/main/contents/libraries/sky130_fd_sc_hd/cells/inv/README.html
-        (* keep = "true" *) sky130_fd_sc_hd__inv_1 inv_a ( .Y(tmp), .A(in)  );
-        (* keep = "true" *) sky130_fd_sc_hd__inv_1 inv_b ( .Y(res), .A(tmp) );
-        /* verilator lint_on PINMISSING */
-    `endif
-    assign out = res;
+    wire tmp;
+    /* verilator lint_off PINMISSING */
+    // https://skywater-pdk.readthedocs.io/en/main/contents/libraries/sky130_fd_sc_hd/cells/inv/README.html
+    (* keep = "true" *) sky130_fd_sc_hd__inv_1 inv_a ( .Y(tmp), .A(in)  );
+    (* keep = "true" *) sky130_fd_sc_hd__inv_1 inv_b ( .Y(out), .A(tmp) );
+    /* verilator lint_on PINMISSING */
 endmodule """
 
     if EXPANDED_VERILOG:

@@ -1,20 +1,22 @@
 // Generated from: barabasi_20250115-080837_acc7913_seed176567_epochs100_dispersion128_1020-1020-1020-1020-1020-1020-1020-1020.npz
+`ifdef SIM
+module sky130_fd_sc_hd__inv_1 (
+    input wire A,
+    output wire Y
+);
+    assign Y = ~A;
+endmodule
+`endif
 module relay_conn (
     input wire in,
     output wire out
 );
-    wire tmp, res;
-    `ifdef SIM
-        assign tmp = ~in;
-        assign res = ~tmp;
-    `else
-        /* verilator lint_off PINMISSING */
-        // https://skywater-pdk.readthedocs.io/en/main/contents/libraries/sky130_fd_sc_hd/cells/inv/README.html
-        // (* keep = "true" *) sky130_fd_sc_hd__inv_1 inv_a ( .Y(tmp), .A(in)  );
-        // (* keep = "true" *) sky130_fd_sc_hd__inv_1 inv_b ( .Y(res), .A(tmp) );
-        /* verilator lint_on PINMISSING */
-    `endif
-    assign out = res;
+    wire tmp;
+    /* verilator lint_off PINMISSING */
+    // https://skywater-pdk.readthedocs.io/en/main/contents/libraries/sky130_fd_sc_hd/cells/inv/README.html
+    (* keep = "true" *) sky130_fd_sc_hd__inv_1 inv_a ( .Y(tmp), .A(in)  );
+    (* keep = "true" *) sky130_fd_sc_hd__inv_1 inv_b ( .Y(out), .A(tmp) );
+    /* verilator lint_on PINMISSING */
 endmodule 
 module net (
     input wire  [255:0] in,
