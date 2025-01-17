@@ -130,8 +130,8 @@ module relay_conn (
     `else
         /* verilator lint_off PINMISSING */
         // https://skywater-pdk.readthedocs.io/en/main/contents/libraries/sky130_fd_sc_hd/cells/inv/README.html
-        // (* keep = "true" *) sky130_fd_sc_hd__inv_1 inv_a ( .Y(tmp), .A(in)  );
-        // (* keep = "true" *) sky130_fd_sc_hd__inv_1 inv_b ( .Y(res), .A(tmp) );
+        (* keep = "true" *) sky130_fd_sc_hd__inv_1 inv_a ( .Y(tmp), .A(in)  );
+        (* keep = "true" *) sky130_fd_sc_hd__inv_1 inv_b ( .Y(res), .A(tmp) );
         /* verilator lint_on PINMISSING */
     `endif
     assign out = res;
