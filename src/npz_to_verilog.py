@@ -92,12 +92,18 @@ def generate_verilog(npz_file_name, global_inputs, gates, conn_a, conn_b):
                 relay_count = abs(b - a) // 32
                 for n in range(relay_count):
                     relay = f"far_{layer_idx}_{gate_idx}_{n}"
-                    body += f"    wire [1:0] {relay};"
-                    body += f"    relay_conn {relay}_a(.in({input_a}), .out({relay}[0]));"
-                    body += f"    relay_conn {relay}_b(.in({input_b}), .out({relay}[1]));"
+                    # body += f"    wire [1:0] {relay};"
+                    # body += f"    relay_conn {relay}_a(.in({input_a}), .out({relay}[0]));"
+                    # body += f"    relay_conn {relay}_b(.in({input_b}), .out({relay}[1]));"
+                    # body += "\n"
+                    # input_a = f"{relay}[0]"
+                    # input_b = f"{relay}[1]"
+
+                    body += f"    wire {relay};"
+                    body += f"    relay_conn {relay}_b(.in({input_b}), .out({relay}));"
                     body += "\n"
-                    input_a = f"{relay}[0]"
-                    input_b = f"{relay}[1]"
+                    input_b = f"{relay}"
+
             return body, input_a, input_b
 
         if EXPANDED_VERILOG:
