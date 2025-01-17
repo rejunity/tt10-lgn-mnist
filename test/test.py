@@ -90,7 +90,7 @@ X = \
 # 12K gates, Suggested target density: 0.79
 
 Y =        "../src/baralizm_20250117-183715_acc9336_seed522333_epochs300_dsp128_3x3000_b256_lrm10-1with_dataset.npz"
-# 9K gates, Suggested target density: ???
+# 9K gates, Suggested target density:  0.59
 
 ############################## TEST NETS
 # Y = \
