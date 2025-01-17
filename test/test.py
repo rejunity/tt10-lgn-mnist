@@ -83,7 +83,10 @@ X = \
 # Y =        "../src/barabasi_20250116-120423_acc8188_seed673186_epochs50_dsp128_8x1300_b256_lrm10-2with_dataset.npz"
 # 10K gates
 
-Y =        "../src/barabasi_20250116-110050_acc8484_seed742947_epochs50_dsp128_8x1500_b256_lrm4-4with_dataset.npz"
+# Y =        "../src/barabasi_20250116-110050_acc8484_seed742947_epochs50_dsp128_8x1500_b256_lrm4-4with_dataset.npz"
+# 12K gates
+
+Y =        "../src/baralizm_20250116-123948_acc9424_seed1022128_epochs50_dsp128_3x4000_b256_lrm5-1with_dataset.npz"
 # 12K gates
 
 ############################## TEST NETS
