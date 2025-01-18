@@ -92,8 +92,12 @@ X = \
 # Y =        "../src/baralizm_20250117-183715_acc9336_seed522333_epochs300_dsp128_3x3000_b256_lrm10-1with_dataset.npz"
 # 9K gates, Suggested target density:  0.59
 
-Y =        "../src/baralizm_20250118-072438_acc9263_seed954361_epochs300_dsp128_3x2500_b256_lrm10-1with_dataset.npz"
+# Y =        "../src/baralizm_20250118-072438_acc9263_seed954361_epochs300_dsp128_3x2500_b256_lrm10-1with_dataset.npz"
 # 7.5K gates, Suggested target density:  0.?? (0.49)
+
+Y =        "../src/baralizm_20250118-065915_acc9141_seed115798_epochs300_dsp128_3x2000_b256_lrm10-1with_dataset.npz"
+# 6K gates, Suggested target density:  0.?? (0.39)
+
 
 ############################## TEST NETS
 # Y = \
