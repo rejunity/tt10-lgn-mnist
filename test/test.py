@@ -82,9 +82,17 @@ X = \
 
 # Y =        "../src/barabasi_20250116-120423_acc8188_seed673186_epochs50_dsp128_8x1300_b256_lrm10-2with_dataset.npz"
 # 10K gates
+# Multi-Input combinational cell: 7797
+# Util: 26.044 % [INFO GPL]
+# NewTargetDensity: 0.8221
+# ICESTORM_LC:    4713/   5280    89%   Router1 time 165.76s
 
 # Y =        "../src/barabasi_20250116-110050_acc8484_seed742947_epochs50_dsp128_8x1500_b256_lrm4-4with_dataset.npz"
 # 12K gates, Suggested target density: 0.31
+# Multi-Input combinational cell: 9095
+# Util: 30.209 %
+# NewTargetDensity: 0.841
+# ICESTORM_LC:    5525/   5280   104%
 
 # Y =        "../src/baralizm_20250116-123948_acc9424_seed1022128_epochs50_dsp128_3x4000_b256_lrm5-1with_dataset.npz"
 # 12K gates, Suggested target density: 0.79
@@ -93,10 +101,12 @@ X = \
 # 9K gates, Suggested target density:  0.59
 
 # Y =        "../src/baralizm_20250118-072438_acc9263_seed954361_epochs300_dsp128_3x2500_b256_lrm10-1with_dataset.npz"
-# 7.5K gates, Suggested target density:  0.?? (0.49)
+# 7.5K gates, Suggested target density: 0.?? (0.49)
 
 Y =        "../src/baralizm_20250118-065915_acc9141_seed115798_epochs300_dsp128_3x2000_b256_lrm10-1with_dataset.npz"
-# 6K gates, Suggested target density:  0.?? (0.39)
+# 6K gates, Suggested target density:  0.39
+# Multi-Input combinational cell: 11656
+# ICESTORM_LC:    6289/   5280   119%
 
 
 ############################## TEST NETS
