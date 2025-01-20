@@ -80,7 +80,7 @@ X = \
 #  [942]] # 16K gates barabasi_20250115-050146_acc8915_seed803984_epochs100_dispersion64_2040-2040-2040-2040-2040-2040-2040-2040.v
 # Y =          "../src/barabasi_20250115-050146_acc8915_seed803984_epochs100_dispersion64_2040-2040-2040-2040-2040-2040-2040-2040with_dataset.npz"
 
-# Y =        "../src/barabasi_20250116-120423_acc8188_seed673186_epochs50_dsp128_8x1300_b256_lrm10-2with_dataset.npz"
+Y =        "../src/barabasi_20250116-120423_acc8188_seed673186_epochs50_dsp128_8x1300_b256_lrm10-2with_dataset.npz"
 # 10K gates
 # Multi-Input combinational cell: 7797
 # Util: 26.044 % [INFO GPL]
@@ -103,7 +103,7 @@ X = \
 # Y =        "../src/baralizm_20250118-072438_acc9263_seed954361_epochs300_dsp128_3x2500_b256_lrm10-1with_dataset.npz"
 # 7.5K gates, Suggested target density: 0.?? (0.49)
 
-Y =        "../src/baralizm_20250118-065915_acc9141_seed115798_epochs300_dsp128_3x2000_b256_lrm10-1with_dataset.npz"
+# Y =        "../src/baralizm_20250118-065915_acc9141_seed115798_epochs300_dsp128_3x2000_b256_lrm10-1with_dataset.npz"
 # 6K gates, Suggested target density:  0.39
 # Multi-Input combinational cell: 11656
 # ICESTORM_LC:    6289/   5280   119%
