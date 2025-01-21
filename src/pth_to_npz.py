@@ -62,7 +62,7 @@ def pth_to_npz(checkpoint):
 
 if __name__ == "__main__":
     if len(sys.argv) != 2 and len(sys.argv) != 3:
-        print(f"Usage: python {sys.argv[0]}.py <input_npz_file_name> <output_verilog_file_name>")
+        print(f"Usage: python {sys.argv[0]} <input_npz_file_name> <output_verilog_file_name>")
         sys.exit(1)
 
     pth_file_name = sys.argv[1]

@@ -257,7 +257,7 @@ def npz_to_verilog(data, max_layers=-1):
 
 if __name__ == "__main__":
     if len(sys.argv) != 2 and len(sys.argv) != 3:
-        print(f"Usage: python {sys.argv[0]}.py <input_npz_file_name> <output_verilog_file_name> (optional: <max_layers>)")
+        print(f"Usage: python {sys.argv[0]} <input_npz_file_name> <output_verilog_file_name> (optional: <max_layers>)")
         sys.exit(1)
 
     npz_file_name = sys.argv[1]
