@@ -6,19 +6,25 @@ import os
 
 # Reference for network training: https://gist.github.com/rejunity/bff3857ce1fad9f11fbfed0db0f2bbc8
 
-if len(sys.argv) != 2 and len(sys.argv) != 3:
-    print("Usage: python load_npz_file.py <input_npz_file_name> <output_verilog_file_name>")
-    sys.exit(1)
+def load_pth_file(file_name):
+    if not file_name.endswith('.pth'):
+        raise ValueError(f"The file '{file_name}' is not a .pth file.")
 
-pth_file_name = sys.argv[1]
-if len(sys.argv) == 3:
-	npz_file_name = sys.argv[2]
-else:
-	npz_file_name = os.path.splitext(pth_file_name)[0] + ".npz"
+    if not os.path.isfile(file_name):
+        raise FileNotFoundError(f"The file '{file_name}' does not exist.")
 
-checkpoint = torch.load(pth_file_name, map_location=torch.device('cpu'), weights_only=True)
+    try:
+        checkpoint = torch.load(file_name, map_location=torch.device('cpu'), weights_only=True)
+        return checkpoint
+    except Exception as e:
+        raise RuntimeError(f"Failed to load the .pth file: {e}")
 
-if isinstance(checkpoint, dict):
+def save_npz_file(file_name, npz_data):
+    np.savez(file_name, **npz_data)
+
+#--- CORE function ------------------------------------------------------------------------
+
+def pth_to_npz(checkpoint):
     connections = checkpoint.pop("connections")
     dataset_input = checkpoint.pop("dataset_input")
     dataset_output = checkpoint.pop("dataset_output")
@@ -44,12 +50,29 @@ if isinstance(checkpoint, dict):
     padded_size = gate_types.size + connections[0].size + connections[1].size 
     if padded_size - original_size > 0:
         print("Number of new null gates & connections added for padding:", padded_size - original_size)
+    print("Total number of gates in the network:", np.size(gate_types))
 
-    numpy_dict = {  "gate_types"    : gate_types,
-                    "connections.A" : connections[0],
-                    "connections.B" : connections[1],
-                    "input"         : dataset_input,
-                    "output"        : dataset_output }
-    np.savez(npz_file_name, **numpy_dict)
+    return {    "gate_types"    : gate_types,
+                "connections.A" : connections[0],
+                "connections.B" : connections[1],
+                "input"         : dataset_input,
+                "output"        : dataset_output }
 
-    print("Totoal number of gates in the network:", np.size(gate_types))
+###########################################################################################
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2 and len(sys.argv) != 3:
+        print(f"Usage: python {sys.argv[0]}.py <input_npz_file_name> <output_verilog_file_name>")
+        sys.exit(1)
+
+    pth_file_name = sys.argv[1]
+    if len(sys.argv) == 3:
+        npz_file_name = sys.argv[2]
+    else:
+        npz_file_name = os.path.splitext(pth_file_name)[0] + ".npz"
+
+    checkpoint = load_pth_file(pth_file_name)
+    data = pth_to_npz(checkpoint)
+    save_npz_file(npz_file_name, data)
+
+    print(f"Data has been converted and saved to '{npz_file_name}'.")
