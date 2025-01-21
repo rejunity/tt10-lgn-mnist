@@ -3,8 +3,12 @@ import os
 import numpy as np
 
 
-# TODO: Inject additional pass-through (negate / or) gates on the long connections.
+# DONE: Inject additional pass-through (negate / or) gates on the long connections.
 #       Use keep directive to avoid optimisastion by Yosys.
+
+# TODO: * %Warning-UNUSEDSIGNAL / predict gate count
+#       * Fanout historgram
+#       * Predict wire length 
 
 # def save(model, npz_fname):
 #     gate_types = [torch.argmax(layer.w.data, dim=0) for layer in model.layers];
@@ -18,7 +22,7 @@ EXPANDED_VERILOG = False
 # EXPANDED_VERILOG = True
 
 RELAY_LONG_CONNECTIONS = False
-# RELAY_LONG_CONNECTIONS = 32
+# RELAY_LONG_CONNECTIONS = 64
 
 MAX_LAYERS = -1
 
@@ -89,7 +93,7 @@ def generate_verilog(npz_file_name, global_inputs, gates, conn_a, conn_b):
             input_a = f"{input}[{a}]"
             input_b = f"{input}[{b}]"
             if RELAY_LONG_CONNECTIONS > 0:
-                relay_count = abs(b - a) // 32
+                relay_count = abs(b - a) // RELAY_LONG_CONNECTIONS
                 for n in range(relay_count):
                     relay = f"far_{layer_idx}_{gate_idx}_{n}"
                     # body += f"    wire [1:0] {relay};"
@@ -141,7 +145,8 @@ module relay_conn (
     /* verilator lint_off PINMISSING */
     // https://skywater-pdk.readthedocs.io/en/main/contents/libraries/sky130_fd_sc_hd/cells/inv/README.html
     (* keep = "true" *) sky130_fd_sc_hd__inv_1 inv_a ( .Y(tmp), .A(in)  );
-    (* keep = "true" *) sky130_fd_sc_hd__inv_1 inv_b ( .Y(out), .A(tmp) );
+    // (* keep = "true" *) sky130_fd_sc_hd__inv_1 inv_b ( .Y(out), .A(tmp) );
+    assign out = ~tmp; // allow the second inverter to be optimized
     /* verilator lint_on PINMISSING */
 endmodule """
 
