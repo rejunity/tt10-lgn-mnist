@@ -24,21 +24,6 @@ EXPANDED_VERILOG = False
 RELAY_LONG_CONNECTIONS = False
 # RELAY_LONG_CONNECTIONS = 64
 
-MAX_LAYERS = -1
-
-def load_npz_file(file_name):
-    if not file_name.endswith('.npz'):
-        raise ValueError(f"The file '{file_name}' is not a .npz file.")
-
-    if not os.path.isfile(file_name):
-        raise FileNotFoundError(f"The file '{file_name}' does not exist.")
-
-    try:
-        data = np.load(file_name)
-        return data
-    except Exception as e:
-        raise RuntimeError(f"Failed to load the .npz file: {e}")
-
 def op(gate_type, A, B):
     return [
         f"1'b0",
@@ -59,20 +44,13 @@ def op(gate_type, A, B):
         f"1'b1"
     ][gate_type]
 
-def generate_verilog(npz_file_name, global_inputs, gates, conn_a, conn_b):
+def generate_verilog(global_inputs, gates, conn_a, conn_b):
+    assert len(gates) == len(conn_a) == len(conn_b)
     global_outputs = len(gates[-1])
 
     decl = ""
     body = ""
     gate_idx = 0
-    assert len(gates) == len(conn_a) == len(conn_b)
-    if MAX_LAYERS > 0 and len(gates) > MAX_LAYERS:
-        layers_to_cut = len(gates) - MAX_LAYERS
-        print(f"Optional max_layers = {MAX_LAYERS} parameter was specified, cutting the last {layers_to_cut} layer(s)!")
-        gates = gates[:-layers_to_cut]
-        conn_a = conn_a[:-layers_to_cut]
-        conn_b = conn_b[:-layers_to_cut]
-        print(f"There are {len(gates)} layers after cut.")
     for layer_idx, layer_gates, layer_conn_a, layer_conn_b in zip(range(len(gates)), gates, conn_a, conn_b):
         if layer_idx > 0:
             decl += f"    wire [{len(gates[layer_idx-1])}:0] layer_{layer_idx-1};\n"
@@ -126,7 +104,7 @@ def generate_verilog(npz_file_name, global_inputs, gates, conn_a, conn_b):
                 body += f"    assign {output}[{out_idx}] = {op(gate, f'{input_a}', f'{input_b}')}; \n"
                 gate_idx += 1
 
-    verilog = f"// Generated from: {npz_file_name}"
+    verilog = ""
     if RELAY_LONG_CONNECTIONS > 0:
         verilog += f"""
 `ifdef SIM
@@ -219,30 +197,30 @@ def ascii_histogram_compressed(values, bins=64):
     # print(len(counts))
     return ascii_graph(counts)
 
-###########################################################################################
+def load_npz_file(file_name):
+    if not file_name.endswith('.npz'):
+        raise ValueError(f"The file '{file_name}' is not a .npz file.")
 
-if __name__ == "__main__":
-    if len(sys.argv) != 2 and len(sys.argv) != 3:
-        print("Usage: python load_npz_file.py <input_npz_file_name> <output_verilog_file_name> (optional: <max_layers>)")
-        sys.exit(1)
-
-    npz_file_name = sys.argv[1]
-    if len(sys.argv) == 3:
-        verilog_file_name = sys.argv[2]
-    else:
-        verilog_file_name = os.path.splitext(npz_file_name)[0] + ".v"
-    if len(sys.argv) > 3:
-        MAX_LAYERS = int(sys.argv[3])
+    if not os.path.isfile(file_name):
+        raise FileNotFoundError(f"The file '{file_name}' does not exist.")
 
     try:
-        data = load_npz_file(npz_file_name)
+        data = np.load(file_name)
         print("File loaded successfully.")
         print("Contents:")
         for key in data.keys():
             print(f"{key}: {data[key].shape}, dtype={data[key].dtype}")
+        return data
     except Exception as e:
-        print(f"Error: {e}")
+        raise RuntimeError(f"Failed to load the .npz file: {e}")
 
+def save_verilog_file(file_name, verilog):
+    with open(file_name, "w") as f:
+        f.write(verilog)
+
+#--- CORE function ------------------------------------------------------------------------
+
+def npz_to_verilog(data, max_layers=-1):
     gates = data['gate_types']
     conn_a = data['connections.A']
     conn_b = data['connections.B']
@@ -252,7 +230,16 @@ if __name__ == "__main__":
     if (gates.shape[0] > conn_a.shape[0]):
         conn_a = np.vstack((np.zeros(len(gates[0]), dtype=conn_a.dtype), conn_a))
         conn_b = np.vstack((np.ones (len(gates[0]), dtype=conn_b.dtype), conn_b))
-    input_count = np.max([np.max(conn_a[0,:]), np.max(conn_b[0,:])]) + 1
+
+    # (optional) cut layers above max_layers
+    assert len(gates) == len(conn_a) == len(conn_b)
+    if max_layers > 0 and len(gates) > max_layers:
+        layers_to_cut = len(gates) - max_layers
+        print(f"Optional max_layers = {max_layers} parameter was specified, cutting the last {layers_to_cut} layer(s)!")
+        gates = gates[:-layers_to_cut]
+        conn_a = conn_a[:-layers_to_cut]
+        conn_b = conn_b[:-layers_to_cut]
+        print(f"There are {len(gates)} layers after cut.")
 
     print()
     print("Layer statistics:")
@@ -261,11 +248,31 @@ if __name__ == "__main__":
     conn_distance = np.abs(conn_b - conn_a)
     for i, g, d in zip(range(len(gates)), gates, conn_distance):
         print(f"{i:3}", ascii_histogram(g)[0], "   ", ascii_histogram_compressed(d)[0])
-        # print(d)
     print("   ","0&⇒A⇐B⊕||⊕B⇐A⇒&1")
 
-    verilog = generate_verilog(npz_file_name, input_count, gates, conn_a, conn_b)
+    input_count = np.max([np.max(conn_a[0,:]), np.max(conn_b[0,:])]) + 1
+    return generate_verilog(input_count, gates, conn_a, conn_b)
 
-    with open(verilog_file_name, "w") as f:
-        f.write(verilog)
+###########################################################################################
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2 and len(sys.argv) != 3:
+        print(f"Usage: python {sys.argv[0]}.py <input_npz_file_name> <output_verilog_file_name> (optional: <max_layers>)")
+        sys.exit(1)
+
+    npz_file_name = sys.argv[1]
+    if len(sys.argv) == 3:
+        verilog_file_name = sys.argv[2]
+    else:
+        verilog_file_name = os.path.splitext(npz_file_name)[0] + ".v"
+    max_layers = -1
+    if len(sys.argv) > 3:
+        max_layers = int(sys.argv[3])
+
+    data = load_npz_file(npz_file_name)
+    verilog = f"// Generated from: {npz_file_name}\n" + \
+        npz_to_verilog(data, max_layers)
+
+    save_verilog_file(verilog_file_name, verilog)
     print(f"Verilog code has been generated and saved to '{verilog_file_name}'.")
+
