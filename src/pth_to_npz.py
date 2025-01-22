@@ -31,6 +31,8 @@ def pth_to_npz(checkpoint):
     layers = [checkpoint[f"layers.{i}.w"] for i in range(len([k for k in checkpoint if k.startswith('layers.') and k.endswith('.w')]))]
 
     assert len(connections) == 2
+    if "net_architecture" in checkpoint:
+        print("Architecture: ", checkpoint["net_architecture"])
     print("Number of layers: ", len(layers))
 
     gate_types = [torch.argmax(layer, dim=0) for layer in layers]
