@@ -12,73 +12,22 @@ gates_value = os.getenv('GATES')
 GATE_LEVEL_SIMULATION = not gates_value in (None, "no")
 print("GATES", GATE_LEVEL_SIMULATION)
 
+CLEAR_BETWEEN_TEST_SAMPLES = False
+# CLEAR_BETWEEN_TEST_SAMPLES = True
 
-# X = \
-# [[1, 1],
-#  [1, 0],
-#  [0, 1],
-#  [0, 0]]
-
-# Y = \
-# [[1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-#  [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
-#  [0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
-#  [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1]]
+# X = [[1, 1], [1, 0], [0, 1], [0, 0]]
+# Y =[[1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0], [0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1]]
 
 X = \
 [[0] * 256,
- # [0, 1] * 128,
  [1] * 256]
 
-# Y = \
-# [[1832],
-#  [1785],
-#  [1773]] # 24K gates
-
-# Y = \
-# [[1996],
-#  [1978],
-#  [1988]] # 20K gates
-
-# Y = \
-# [[2007],
-#  [2005],
-#  [2014]] # 16K gates
-
-# Y = \
-# [[1968],
-#  [1983],
-#  [2015]] # 12K gates
-
-
-# Y = \
-# [[1968],
-#  [1983],
-#  [2015]] # 12K gates
-
-# Y = \
-# [[166],
-#  [123]] # 8K gates final_20250113-141316_acc4865_seed775741_epochs50_dispersion16_8x1024.v
-# Y = \
-# [[292],
-#  [181]] # 8K gates final_20250113-143813_acc3391_seed259890_epochs30_dispersion4_8x1024.v
-# Y = \
-# [[215],   
-#  [173]] # 8K gates final_20250114-123035_acc5871_seed382310_epochs300_dispersion16_1020-1020-1020-1020-1020-1020-1020-1020.v
-# Y = \
-# [[325],
-#  [264]] # 8K gates final_20250114-102550_acc8068_seed1873_epochs300_dispersion64_1020-1020-1020-1020-1020-1020-1020-1020.v
-# Y = \
-# [[422],
-#  [469]] # 8K gates barabasi_20250114-162804_acc7495_seed493279_epochs10_dispersion16_1020-1020-1020-1020-1020-1020-1020-1020.v
-# Y = \
-# [[414],
-#  [423]] # 8K gates barabasi_20250115-080837_acc7913_seed176567_epochs100_dispersion128_1020-1020-1020-1020-1020-1020-1020-1020.v
 # Y =        "../src/barabasi_20250115-080837_acc7913_seed176567_epochs100_dispersion128_1020-1020-1020-1020-1020-1020-1020-1020with_dataset.npz"
-# Y = \
-# [[857],
-#  [942]] # 16K gates barabasi_20250115-050146_acc8915_seed803984_epochs100_dispersion64_2040-2040-2040-2040-2040-2040-2040-2040.v
+# 8K gates
+
 # Y =          "../src/barabasi_20250115-050146_acc8915_seed803984_epochs100_dispersion64_2040-2040-2040-2040-2040-2040-2040-2040with_dataset.npz"
+# 16K gates
+
 
 # Y =        "../src/barabasi_20250116-120423_acc8188_seed673186_epochs50_dsp128_8x1300_b256_lrm10-2with_dataset.npz"
 # 10K gates
@@ -182,10 +131,20 @@ def assert_output(dut, y):
         # take only first bits (in string format)
         assert str(dut.tt_um_rejunity_lgn_mnist.y.value)[::-1].startswith(array_to_bin(y))
 
-    expected = int(sum(y))
-    computed = dut.uio_out.value * 256 + dut.uo_out.value
-    dut._log.info(f"Expected: {expected}")
-    dut._log.info(f"Computed: {computed}")
+    categories = np.sum(y.reshape(10, -1), -1)
+
+    expected = np.argmax(categories)
+    computed = dut.uio_out.value & 15
+    dut._log.info(f"Expected category: {expected}")
+    dut._log.info(f"Computed category: {computed}")
+
+    assert expected == computed
+
+    expected = int(categories[expected])
+    computed = dut.uo_out.value & 255
+    dut._log.info(f"Expected value: {expected}")
+    dut._log.info(f"Computed value: {computed}")
+
     assert expected == computed
 
 @cocotb.test()
@@ -205,6 +164,10 @@ async def test_project(dut):
     await ClockCycles(dut.clk, 10)
     dut.rst_n.value = 1
 
+    dut.ui_in.value = 0
+    dut.uio_in.value = 0
+    await ClockCycles(dut.clk, 256//8)
+
     dut._log.info("Test network")
     # Set the input values you want to test
     for x, y in zip(X[:8], Y[:8]): # dataset can contain a lot of test samples
@@ -214,15 +177,28 @@ async def test_project(dut):
         dut._log.info("Clear input buffer")
         dut.ui_in.value = 0
         dut.uio_in.value = 0
-        await ClockCycles(dut.clk, 256//8)
+        def category_index(): return dut.uio_out.value & 15
+        def category_value(): return dut.uo_out.value & 255
+        if CLEAR_BETWEEN_TEST_SAMPLES:
+            for i in range(256//8):
+                if i % 2 == 1:
+                    print(f"0000000000000000 best index: {category_index()} value: {category_value()}")
+                await ClockCycles(dut.clk, 1)
+
         dut._log.info(f"Set input buffer, {len(x)} bits")
+        i = 0
         for block_of_8 in split_array(x, 8):
-            print(array_to_bin(block_of_8))
+            print(array_to_bin(block_of_8), end="")
+            if i % 2 == 1:
+                print(f" best index: {category_index()} value: {category_value()}")
             dut.ui_in.value = int(array_to_bin(block_of_8), 2)
             await ClockCycles(dut.clk, 1)
+            i += 1
 
+        dut.ui_in.value = 0
         dut.uio_in.value = 128
         await ClockCycles(dut.clk, 1)
+        dut._log.info(f"Computed best index: {category_index()} value: {category_value()}")
 
         dut._log.info(f"Expected output of the last layer: {array_to_bin(y)}")
 

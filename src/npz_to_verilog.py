@@ -44,7 +44,7 @@ def op(gate_type, A, B):
         f"1'b1"
     ][gate_type]
 
-def generate_verilog(global_inputs, gates, conn_a, conn_b):
+def generate_verilog(global_inputs, gates, conn_a, conn_b, number_of_categories=10, outputs_per_category=256):
     assert len(gates) == len(conn_a) == len(conn_b)
     global_outputs = len(gates[-1])
 
@@ -104,6 +104,30 @@ def generate_verilog(global_inputs, gates, conn_a, conn_b):
                 body += f"    assign {output}[{out_idx}] = {op(gate, f'{input_a}', f'{input_b}')}; \n"
                 gate_idx += 1
 
+    if number_of_categories > 0:
+        body += f"    // Categories ===================================================================\n"
+        out_wires_per_category = global_outputs // number_of_categories
+        for i in range(number_of_categories):
+            cat_lo = i * outputs_per_category
+            out_lo = i * out_wires_per_category
+            cat_hi = cat_lo + min(out_wires_per_category, outputs_per_category) - 1
+            out_hi = out_lo + min(out_wires_per_category, outputs_per_category) - 1
+            body += f"    assign categories[{cat_hi}:{cat_lo}] = out[{out_hi}:{out_lo}];\n"
+
+            if (outputs_per_category > out_wires_per_category):
+                cat_full = cat_lo + outputs_per_category - 1
+                body += f"    assign categories[{cat_full}:{cat_hi + 1}] = 0;\n"
+                  
+            # out_base_idx = category_idx * out_wires_per_category
+            # for i in range(outputs_per_category):
+            #     # body += f"    assign class_{category_idx}[{i}] = "
+            #     # body +=              f"out[{out_base_idx + i}]" if i < out_wires_per_category else "1'b0"
+            #     body += f"    assign categories[{j}] = "
+            #     body +=              f"out[{out_base_idx + i}]" if i < out_wires_per_category else "1'b0"
+            #     body += ";\n"
+            #     j += 1
+
+
     verilog = ""
     if RELAY_LONG_CONNECTIONS > 0:
         verilog += f"""
@@ -161,14 +185,17 @@ endmodule """
     else:
         verilog += f"""
 module net (
-    input wire  [{ global_inputs-1}:0] in,
-    output wire [{global_outputs-1}:0] out
+    input  wire [{ global_inputs-1}:0] in,
+    output wire [{global_outputs-1}:0] out{"," if number_of_categories > 0 else ""}
+    output wire [{number_of_categories*outputs_per_category-1}:0] categories
 );
 {decl}
 {body}
 endmodule
 """
     return verilog
+
+#{",\n".join([f"    output wire [{outputs_per_category-1}:0] category_{i}" for i in range(number_of_categories)])}
 
 def ascii_graph(values):
     # Array of characters for tiny histograms
