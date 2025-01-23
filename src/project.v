@@ -32,60 +32,61 @@ module tt_um_rejunity_lgn_mnist (
 
   reg   [INPUTS-1:0] x;
   wire [OUTPUTS-1:0] y;
-  // wire [BITS_PER_CATEGORY-1:0] categories [CATEGORIES-1:0];
   wire [BITS_PER_CATEGORY*CATEGORIES-1:0] y_categories;
-  net net(.in(x), .out(y),
+  net net(
+    .in(x),
+    .out(y),
     .categories(y_categories)
-    // .class_2(categories[2]),
-    // .class_3(categories[3]),
-    // .class_4(categories[4]),
-    // .class_5(categories[5]),
-    // .class_6(categories[6]),
-    // .class_7(categories[7]),
-    // .class_8(categories[8]),
-    // .class_9(categories[9])
-    );
+  );
 
-  // wire [7:0] categories [CATEGORIES-1:0];
-  wire [8*CATEGORIES-1:0] categories;
-  // genvar i;
-  // generate
-  //   for (i = 0; i < CATEGORIES; i = i+1) begin : categories
-  //     sum_bits #(.N(BITS_PER_CATEGORY)) sum_bits (.y(y_categories[(i+1)*BITS_PER_CATEGORY-1 -: BITS_PER_CATEGORY]), .sum(categories[i]));
-  //   end
-  // endgenerate
+  wire [8*CATEGORIES-1:0] sum_categories;
+  genvar i;
+  generate
+    for (i = 0; i < CATEGORIES; i = i+1) begin : calc_categories
+      sum_bits #(.N(BITS_PER_CATEGORY)) sum_bits(
+        .y(y_categories[i*BITS_PER_CATEGORY +: BITS_PER_CATEGORY]),
+        .sum(sum_categories[i*8 +: 8])
+      );
+    end
+  endgenerate
 
-  sum_bits #(.N(256)) sum_categories_0 (.y(y_categories[ 1*256-1: 0*256]), .sum(categories[ 1*8-1:0*8]));
-  sum_bits #(.N(256)) sum_categories_1 (.y(y_categories[ 2*256-1: 1*256]), .sum(categories[ 2*8-1:1*8]));
-  sum_bits #(.N(256)) sum_categories_2 (.y(y_categories[ 3*256-1: 2*256]), .sum(categories[ 3*8-1:2*8]));
-  sum_bits #(.N(256)) sum_categories_3 (.y(y_categories[ 4*256-1: 3*256]), .sum(categories[ 4*8-1:3*8]));
-  sum_bits #(.N(256)) sum_categories_4 (.y(y_categories[ 5*256-1: 4*256]), .sum(categories[ 5*8-1:4*8]));
-  sum_bits #(.N(256)) sum_categories_5 (.y(y_categories[ 6*256-1: 5*256]), .sum(categories[ 6*8-1:5*8]));
-  sum_bits #(.N(256)) sum_categories_6 (.y(y_categories[ 7*256-1: 6*256]), .sum(categories[ 7*8-1:6*8]));
-  sum_bits #(.N(256)) sum_categories_7 (.y(y_categories[ 8*256-1: 7*256]), .sum(categories[ 8*8-1:7*8]));
-  sum_bits #(.N(256)) sum_categories_8 (.y(y_categories[ 9*256-1: 8*256]), .sum(categories[ 9*8-1:8*8]));
-  sum_bits #(.N(256)) sum_categories_9 (.y(y_categories[10*256-1: 9*256]), .sum(categories[10*8-1:9*8]));
+
+  // wire [BITS_PER_CATEGORY-1:0] y_categories [CATEGORIES-1:0];
+  // net net(
+  //   .in(x),
+  //   .out(y),
+  //   .category_0(y_categories[0]),
+  //   .category_1(y_categories[1]),
+  //   .category_2(y_categories[2]),
+  //   .category_3(y_categories[3]),
+  //   .category_4(y_categories[4]),
+  //   .category_5(y_categories[5]),
+  //   .category_6(y_categories[6]),
+  //   .category_7(y_categories[7]),
+  //   .category_8(y_categories[8]),
+  //   .category_9(y_categories[9])
+  // );
+
+  // wire [8*CATEGORIES-1:0] sum_categories;
+  // sum_bits #(.N(BITS_PER_CATEGORY)) sum_0 (.y(y_categories[0]), .sum(sum_categories[0*8 +: 8]));
+  // sum_bits #(.N(BITS_PER_CATEGORY)) sum_1 (.y(y_categories[1]), .sum(sum_categories[1*8 +: 8]));
+  // sum_bits #(.N(BITS_PER_CATEGORY)) sum_2 (.y(y_categories[2]), .sum(sum_categories[2*8 +: 8]));
+  // sum_bits #(.N(BITS_PER_CATEGORY)) sum_3 (.y(y_categories[3]), .sum(sum_categories[3*8 +: 8]));
+  // sum_bits #(.N(BITS_PER_CATEGORY)) sum_4 (.y(y_categories[4]), .sum(sum_categories[4*8 +: 8]));
+  // sum_bits #(.N(BITS_PER_CATEGORY)) sum_5 (.y(y_categories[5]), .sum(sum_categories[5*8 +: 8]));
+  // sum_bits #(.N(BITS_PER_CATEGORY)) sum_6 (.y(y_categories[6]), .sum(sum_categories[6*8 +: 8]));
+  // sum_bits #(.N(BITS_PER_CATEGORY)) sum_7 (.y(y_categories[7]), .sum(sum_categories[7*8 +: 8]));
+  // sum_bits #(.N(BITS_PER_CATEGORY)) sum_8 (.y(y_categories[8]), .sum(sum_categories[8*8 +: 8]));
+  // sum_bits #(.N(BITS_PER_CATEGORY)) sum_9 (.y(y_categories[9]), .sum(sum_categories[9*8 +: 8]));
 
   wire [3:0] best_category_index;
   wire [7:0] best_category_value;
-  arg_max_10 arg_max_categories(.categories(categories), .max_index(best_category_index), .max_value(best_category_value));
-  // initial
-  //     $monitor("best:%d", best_category_index);
-  // initial
-  //   $monitor("0:%d 1:%d 2:%d 3:%d 4:%d 5:%d 6:%d 7:%d 8:%d 9:%d ", categories[0], categories[1], categories[2], categories[3], categories[4], categories[5], categories[6], categories[7],  categories[8], categories[9]);
+  arg_max_10 arg_max_categories(
+    .categories(sum_categories),
+    .out_index(best_category_index),
+    .out_value(best_category_value)
+  );
 
-  wire [14:0] sum;
-  // sum_bits #(.N(OUTPUTS)) sum_outputs (.y(y), .sum(sum));
-  assign sum =  categories[ 1*8-1:0*8] +
-                categories[ 2*8-1:1*8] +
-                categories[ 3*8-1:2*8] +
-                categories[ 4*8-1:3*8] +
-                categories[ 5*8-1:4*8] +
-                categories[ 6*8-1:5*8] +
-                categories[ 7*8-1:6*8] +
-                categories[ 8*8-1:7*8] +
-                categories[ 9*8-1:8*8] +
-                categories[10*8-1:9*8] ;
   assign  uo_out[7:0] = best_category_value;
   assign uio_out[3:0] = best_category_index;
   assign uio_out[6:4] = 0;
@@ -114,8 +115,8 @@ endmodule
 
 module arg_max_10(
     input wire [10*8-1:0] categories,
-    output reg [3:0] max_index,
-    output reg [7:0] max_value
+    output reg [3:0] out_index,
+    output reg [7:0] out_value
 );
     // Intermediate wires for the tree comparison
     reg [7:0] max_value_stage1 [4:0];  // Stage 1: Compare adjacent pairs
@@ -175,7 +176,7 @@ module arg_max_10(
         end
 
         // Assign final max index
-        max_index = max_index_stage3;
-        max_value = max_value_stage3;
+        out_index = max_index_stage3;
+        out_value = max_value_stage3;
     end
 endmodule
