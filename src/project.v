@@ -29,7 +29,7 @@ module tt_um_rejunity_lgn_mnist (
   localparam BITS_PER_CATEGORY_SUM = $clog2(BITS_PER_CATEGORY);
   always @(posedge clk) begin : set_inputs
     if (write_enable)
-      x <= {x[INPUTS-8:0], ui_in[7:0]};
+      x <= {x[INPUTS-8-1:0], ui_in[7:0]};
   end
 
   reg   [INPUTS-1:0] x;
