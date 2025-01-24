@@ -103,10 +103,10 @@ def generate_verilog(global_inputs, gates, conn_a, conn_b, number_of_categories=
         body += f"    // Arrange outputs in categories ================================================\n"
         out_wires_per_category = global_outputs // number_of_categories
         for i in range(number_of_categories):
-            cat_lo = i * output_bits_per_category
             out_lo = i * out_wires_per_category
-            cat_hi = cat_lo + min(out_wires_per_category, output_bits_per_category) - 1
+            cat_lo = i * output_bits_per_category
             out_hi = out_lo + min(out_wires_per_category, output_bits_per_category) - 1
+            cat_hi = cat_lo + min(out_wires_per_category, output_bits_per_category) - 1
             body += f"    assign categories[{cat_hi}:{cat_lo}] = out[{out_hi}:{out_lo}];\n"
 
             if (output_bits_per_category > out_wires_per_category):
