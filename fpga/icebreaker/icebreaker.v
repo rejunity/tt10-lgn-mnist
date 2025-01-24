@@ -21,7 +21,7 @@ module top (
 );
     reg [31:0] counter;
     reg flip;
-    always @(posedge clk_pixel) begin
+    always @(posedge CLK) begin
         counter <= counter + 1;
         if (counter == 12*1000*1000) begin
             flip <= ~flip;
