@@ -14,6 +14,8 @@ print("GATES", GATE_LEVEL_SIMULATION)
 
 CLEAR_BETWEEN_TEST_SAMPLES = False
 # CLEAR_BETWEEN_TEST_SAMPLES = True
+# CLEAR_WITH_ALTERNATING_PATTERN = False
+CLEAR_WITH_ALTERNATING_PATTERN = True
 
 # X = [[1, 1], [1, 0], [0, 1], [0, 0]]
 # Y =[[1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0], [0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1]]
@@ -170,20 +172,25 @@ async def test_project(dut):
 
     dut._log.info("Test network")
     # Set the input values you want to test
+    alt = 0
     for x, y in zip(X[:8], Y[:8]): # dataset can contain a lot of test samples
                                    # take only 8 for tractable speed of the test
         x = x[::-1] # reverse input data for uploading via the shift register
         dut._log.info(f"Input: {array_to_bin(x)}")
         dut._log.info("Clear input buffer")
-        dut.ui_in.value = 0
+        dut.ui_in.value = 0 if alt == 0 else 255
         dut.uio_in.value = 0
         def category_index(): return dut.uio_out.value & 15
-        def category_value(): return dut.uo_out.value & 255
+        def category_value(): return bin(dut.uo_out.value & 255)
         if CLEAR_BETWEEN_TEST_SAMPLES:
             for i in range(256//8):
                 if i % 2 == 1:
-                    print(f"0000000000000000 best index: {category_index()} value: {category_value()}")
+                    if alt == 0:
+                        print(f"0000000000000000 best index: {category_index()} value: {category_value()}")
+                    else:
+                        print(f"1111111111111111 best index: {category_index()} value: {category_value()}")
                 await ClockCycles(dut.clk, 1)
+            alt = 1-alt if CLEAR_WITH_ALTERNATING_PATTERN else alt
 
         dut._log.info(f"Set input buffer, {len(x)} bits")
         i = 0
