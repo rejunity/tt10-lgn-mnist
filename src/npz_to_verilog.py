@@ -10,19 +10,14 @@ import numpy as np
 #       * Fanout historgram
 #       * Predict wire length 
 
-# def save(model, npz_fname):
-#     gate_types = [torch.argmax(layer.w.data, dim=0) for layer in model.layers];
-#     gate_types = torch.stack(gate_types, dim=0).cpu().numpy()
-#     numpy_dict = {  "gate_types" : gate_types,
-#                     "connections.A" : model.connections[0].cpu().numpy(),
-#                     "connections.B" : model.connections[1].cpu().numpy() }
-#     np.savez(npz_fname, **numpy_dict)
-
 EXPANDED_VERILOG = False
 # EXPANDED_VERILOG = True
 
 RELAY_LONG_CONNECTIONS = False
 # RELAY_LONG_CONNECTIONS = 64
+
+NUMBER_OF_CATEGORIES = 10
+OUTPUT_BITS_PER_CATEGORY = 512
 
 def op(gate_type, A, B):
     return [
@@ -44,7 +39,7 @@ def op(gate_type, A, B):
         f"1'b1"
     ][gate_type]
 
-def generate_verilog(global_inputs, gates, conn_a, conn_b, number_of_categories=10, outputs_per_category=256):
+def generate_verilog(global_inputs, gates, conn_a, conn_b, number_of_categories=NUMBER_OF_CATEGORIES, output_bits_per_category=OUTPUT_BITS_PER_CATEGORY):
     assert len(gates) == len(conn_a) == len(conn_b)
     global_outputs = len(gates[-1])
 
@@ -105,28 +100,18 @@ def generate_verilog(global_inputs, gates, conn_a, conn_b, number_of_categories=
                 gate_idx += 1
 
     if number_of_categories > 0:
-        body += f"    // Categories ===================================================================\n"
+        body += f"    // Arrange outputs in categories ================================================\n"
         out_wires_per_category = global_outputs // number_of_categories
         for i in range(number_of_categories):
-            cat_lo = i * outputs_per_category
+            cat_lo = i * output_bits_per_category
             out_lo = i * out_wires_per_category
-            cat_hi = cat_lo + min(out_wires_per_category, outputs_per_category) - 1
-            out_hi = out_lo + min(out_wires_per_category, outputs_per_category) - 1
+            cat_hi = cat_lo + min(out_wires_per_category, output_bits_per_category) - 1
+            out_hi = out_lo + min(out_wires_per_category, output_bits_per_category) - 1
             body += f"    assign categories[{cat_hi}:{cat_lo}] = out[{out_hi}:{out_lo}];\n"
 
-            if (outputs_per_category > out_wires_per_category):
-                cat_full = cat_lo + outputs_per_category - 1
+            if (output_bits_per_category > out_wires_per_category):
+                cat_full = cat_lo + output_bits_per_category - 1
                 body += f"    assign categories[{cat_full}:{cat_hi + 1}] = 0;\n"
-                  
-            # out_base_idx = category_idx * out_wires_per_category
-            # for i in range(outputs_per_category):
-            #     # body += f"    assign class_{category_idx}[{i}] = "
-            #     # body +=              f"out[{out_base_idx + i}]" if i < out_wires_per_category else "1'b0"
-            #     body += f"    assign categories[{j}] = "
-            #     body +=              f"out[{out_base_idx + i}]" if i < out_wires_per_category else "1'b0"
-            #     body += ";\n"
-            #     j += 1
-
 
     verilog = ""
     if RELAY_LONG_CONNECTIONS > 0:
@@ -187,15 +172,13 @@ endmodule """
 module net (
     input  wire [{ global_inputs-1}:0] in,
     output wire [{global_outputs-1}:0] out{"," if number_of_categories > 0 else ""}
-    output wire [{number_of_categories*outputs_per_category-1}:0] categories
+    output wire [{number_of_categories*output_bits_per_category-1}:0] categories
 );
 {decl}
 {body}
 endmodule
 """
     return verilog
-
-#{",\n".join([f"    output wire [{outputs_per_category-1}:0] category_{i}" for i in range(number_of_categories)])}
 
 def ascii_graph(values):
     # Array of characters for tiny histograms
