@@ -181,7 +181,7 @@ async def test_project(dut):
         dut.ui_in.value = 0 if alt == 0 else 255
         dut.uio_in.value = 0
         def category_index(): return dut.uio_out.value & 15
-        def category_value(): return bin(dut.uo_out.value & 255)
+        def category_value(): return dut.uo_out.value & 255
         if CLEAR_BETWEEN_TEST_SAMPLES:
             for i in range(256//8):
                 if i % 2 == 1:
