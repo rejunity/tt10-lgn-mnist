@@ -97,9 +97,9 @@ module sum_511_bits (
     wire [7:0] count3;
     PopCount128 popcount0(.data(y[0*128 +: 128]), .count(count0));
     PopCount128 popcount1(.data(y[1*128 +: 128]), .count(count1));
-    PopCount128 popcount2(.data(y[2*128 +: 128]), .count(count2));
-    PopCount128 popcount3(.data(y[3*128 +: 128]), .count(count3));
-    assign sum = count0 + count1 + count2 + count3;
+    // PopCount128 popcount2(.data(y[2*128 +: 128]), .count(count2));
+    // PopCount128 popcount3(.data(y[3*128 +: 128]), .count(count3));
+    assign sum = count0 + count1;// + count2 + count3;
 endmodule
 
 module arg_max_10 #(
