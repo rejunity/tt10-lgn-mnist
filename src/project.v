@@ -94,14 +94,14 @@ module arg_max_10 #(
     output reg [7:0] out_value
 );
     // Intermediate wires for the tree comparison
-    reg [N-1:0] max_value_stage1 [4:0];  // Stage 1: Compare adjacent pairs
-    reg [3:0]   max_index_stage1 [4:0]; 
+    (* mem2reg *) reg [N-1:0] max_value_stage1 [4:0];  // Stage 1: Compare adjacent pairs
+    (* mem2reg *) reg [3:0]   max_index_stage1 [4:0]; 
 
-    reg [N-1:0] max_value_stage2 [2:0];  // Stage 2: Compare reduced pairs
-    reg [3:0]   max_index_stage2 [2:0]; 
+    (* mem2reg *) reg [N-1:0] max_value_stage2 [2:0];  // Stage 2: Compare reduced pairs
+    (* mem2reg *) reg [3:0]   max_index_stage2 [2:0]; 
 
-    reg [N-1:0] max_value_stage3;        // Stage 3: Final comparison
-    reg [3:0]   max_index_stage3;
+                  reg [N-1:0] max_value_stage3;        // Stage 3: Final comparison
+                  reg [3:0]   max_index_stage3;
 
     integer i;
 
