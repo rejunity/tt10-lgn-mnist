@@ -45,7 +45,8 @@ module tt_um_rejunity_lgn_mnist (
   genvar i;
   generate
     for (i = 0; i < CATEGORIES; i = i+1) begin : calc_categories
-      sum_bits #(.N(BITS_PER_CATEGORY)) sum_bits(
+      // sum_bits #(.N(BITS_PER_CATEGORY)) sum_bits(
+      sum_511_bits sum_bits(
         .y(y_categories[i*BITS_PER_CATEGORY +: BITS_PER_CATEGORY]),
         .sum(sum_categories[i*BITS_PER_CATEGORY_SUM +: BITS_PER_CATEGORY_SUM])
       );
@@ -84,6 +85,21 @@ module sum_bits #(
     end
     
     assign sum = temp_sum;
+endmodule
+
+module sum_511_bits (
+    input wire [512-1:0] y,
+    output wire  [9-1:0] sum
+);
+    wire [7:0] count0;
+    wire [7:0] count1;
+    wire [7:0] count2;
+    wire [7:0] count3;
+    PopCount128 popcount0(.data(y[0*128 +: 128]), .count(count0));
+    PopCount128 popcount1(.data(y[1*128 +: 128]), .count(count1));
+    PopCount128 popcount2(.data(y[2*128 +: 128]), .count(count2));
+    PopCount128 popcount3(.data(y[3*128 +: 128]), .count(count3));
+    assign sum = count0 + count1 + count2 + count3;
 endmodule
 
 module arg_max_10 #(
