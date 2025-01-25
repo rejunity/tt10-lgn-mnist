@@ -54,11 +54,14 @@ X = \
 # Y =        "../src/baralizm_20250118-072438_acc9263_seed954361_epochs300_dsp128_3x2500_b256_lrm10-1with_dataset.npz"
 # 7.5K gates, Suggested target density: 0.?? (0.49)
 
-Y =        "../src/baralizm_20250118-065915_acc9141_seed115798_epochs300_dsp128_3x2000_b256_lrm10-1with_dataset.npz"
+# Y =        "../src/baralizm_20250118-065915_acc9141_seed115798_epochs300_dsp128_3x2000_b256_lrm10-1with_dataset.npz"
 # 6K gates, Suggested target density:  0.39
 # Multi-Input combinational cell: 11656
+# With FA/HA, multi-Input combinational cell: 6170 (TargetDensity: 0.705, congestion:  82.75%) (8352 total cells, 3213 ha/fa. Utilisation 26.079 %, wire 1216268)
 # ICESTORM_LC:    6289/   5280   119%
 
+
+Y =        "../src/binarized_20250124-150213_acc9269_seed521206_epochs300_3x2550_b256_lrm10-1_pass48with_dataset.npz"
 
 ############################## TEST NETS
 # Y = \
