@@ -344,7 +344,7 @@ module Add2 (
 );
   `ifdef USE_HA_FA_CELLS
     /* verilator lint_off PINMISSING */
-    sky130_fd_sc_hd__ha_1 half_adder(.A(data[0]), .B(data[1]), .COUT(carry), .SUM(sum));
+    sky130_fd_sc_hd__ha_2 half_adder(.A(data[0]), .B(data[1]), .COUT(carry), .SUM(sum));
     /* verilator lint_on PINMISSING */
   `else
     CarrySaveAdder3 add3 (.a(data[0]), .b(data[1]), .c(1'b0),
@@ -361,7 +361,7 @@ module CarrySaveAdder3 (
 );
   `ifdef USE_HA_FA_CELLS
     /* verilator lint_off PINMISSING */
-    sky130_fd_sc_hd__fa_1 full_adder(.A(a), .B(b), .CIN(c), .COUT(carry), .SUM(sum));
+    sky130_fd_sc_hd__fa_2 full_adder(.A(a), .B(b), .CIN(c), .COUT(carry), .SUM(sum));
     /* verilator lint_on PINMISSING */
   `else
     assign sum = a ^ b ^ c;  // XOR for sum
