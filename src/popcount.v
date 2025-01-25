@@ -10,6 +10,33 @@
 `define USE_HA_FA_CELLS
 `endif
 
+module PopCount256 (
+  input [255:0] data,
+  output  [8:0] count // 9 bits to hold from 0 to 256 (inclusive)
+);
+  wire [85+1-1:0] bit0_stage1;
+  wire [28+2-1:0] bit0_stage2;
+  wire [10  -1:0] bit0_stage3;
+  wire [ 3+1-1:0] bit0_stage4;
+  wire [ 1+1-1:0] bit0_stage5;
+  wire [85  -1:0] bit1_stage1;
+  wire [28  -1:0] bit1_stage2;
+  wire [10  -1:0] bit1_stage3;
+  wire [ 3  -1:0] bit1_stage4;
+  wire            bit1_stage5;
+  wire            bit1_stage6;
+  Add256 ad0(.data(data),        .sum(bit0_stage1), .carry(bit1_stage1)); // 85
+  Add86 add1(.data(bit0_stage1), .sum(bit0_stage2), .carry(bit1_stage2)); // 28
+  Add30 add2(.data(bit0_stage2), .sum(bit0_stage3), .carry(bit1_stage3)); // 10
+  Add10 add3(.data(bit0_stage3), .sum(bit0_stage4), .carry(bit1_stage4)); // 3
+  Add4  add4(.data(bit0_stage4), .sum(bit0_stage5), .carry(bit1_stage5)); // 1
+  Add2  add5(.data(bit0_stage5), .sum(count[0]),    .carry(bit1_stage6)); // 0.625
+
+  wire [127:0] pop128 = {bit1_stage1, bit1_stage2, bit1_stage3, bit1_stage4, bit1_stage5, bit1_stage6};
+  PopCount128 count128(.data(pop128), .count(count[8:1]));
+
+endmodule
+
 module PopCount128 (
   input [127:0] data,
   output  [7:0] count // 8 bits to hold from 0 to 128 (inclusive)
@@ -120,6 +147,19 @@ module PopCount32 (
 endmodule
 
 
+module Add256 (
+    input  [255:0] data,
+    output  [85:0] sum,
+    output  [84:0] carry
+);
+  generate
+    genvar i;
+    for (i = 0; i < 255; i = i + 3)
+      CarrySaveAdder3 add3 (.a(data[i  ]), .b(data[i+1]), .c(data[i+2]),
+        .sum(sum[i/3]), .carry(carry[i/3]));
+  endgenerate
+  assign sum[85] = data[255];
+endmodule
 
 module Add128 (
     input  [127:0] data,
@@ -133,6 +173,20 @@ module Add128 (
         .sum(sum[i/3]), .carry(carry[i/3]));
   endgenerate
   assign sum[43:42] = data[127:126];
+endmodule
+
+module Add86 (
+    input  [85:0] data,
+    output [29:0] sum,
+    output [27:0] carry
+);
+  generate
+    genvar i;
+    for (i = 0; i < 84; i = i + 3)
+      CarrySaveAdder3 add3 (.a(data[i  ]), .b(data[i+1]), .c(data[i+2]),
+        .sum(sum[i/3]), .carry(carry[i/3]));
+  endgenerate
+  assign sum[29:28] = data[85:84];
 endmodule
 
 module Add64 (
@@ -177,6 +231,19 @@ module Add32 (
   assign sum[11:10] = data[31:30];
 endmodule
 
+module Add30 (
+    input  [29:0] data,
+    output [ 9:0] sum,
+    output [ 9:0] carry
+);
+  generate
+    genvar i;
+    for (i = 0; i < 30; i = i + 3)
+      CarrySaveAdder3 add3 (.a(data[i  ]), .b(data[i+1]), .c(data[i+2]),
+        .sum(sum[i/3]), .carry(carry[i/3]));
+  endgenerate
+endmodule
+
 module Add22 (
     input  [21:0] data,
     output [ 7:0] sum,
@@ -216,6 +283,20 @@ module Add12 (
       CarrySaveAdder3 add3 (.a(data[i  ]), .b(data[i+1]), .c(data[i+2]),
         .sum(sum[i/3]), .carry(carry[i/3]));
   endgenerate
+endmodule
+
+module Add10 (
+    input  [ 9:0] data,
+    output [ 3:0] sum,
+    output [ 2:0] carry
+);
+  generate
+    genvar i;
+    for (i = 0; i < 9; i = i + 3)
+      CarrySaveAdder3 add3 (.a(data[i  ]), .b(data[i+1]), .c(data[i+2]),
+        .sum(sum[i/3]), .carry(carry[i/3]));
+  endgenerate
+  assign sum[3] = data[9];
 endmodule
 
 module Add8 (
