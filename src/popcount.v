@@ -6,6 +6,7 @@
 `default_nettype none
 
 `ifdef SIM
+`elsif FPGA
 `else
 `define USE_HA_FA_CELLS
 `endif

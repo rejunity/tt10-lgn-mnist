@@ -1,3 +1,5 @@
+`define FPGA
+
 module top (
     input  CLK,
 
