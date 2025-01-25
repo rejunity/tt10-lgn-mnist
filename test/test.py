@@ -61,7 +61,11 @@ X = \
 # ICESTORM_LC:    6289/   5280   119%
 
 
-Y =        "../src/binarized_20250124-150213_acc9269_seed521206_epochs300_3x2550_b256_lrm10-1_pass48with_dataset.npz"
+# Y =        "../src/binarized_20250124-150213_acc9269_seed521206_epochs300_3x2550_b256_lrm10-1_pass48with_dataset.npz"
+# ICESTORM_LC:    6577/   5280   124%
+
+Y =        "../src/binarized_20250124-152724_acc9449_seed470315_epochs100_3x2550_b256_lrm10-1_pass0with_dataset.npz"
+# ICESTORM_LC:    
 
 ############################## TEST NETS
 # Y = \
