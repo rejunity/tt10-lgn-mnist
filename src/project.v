@@ -25,7 +25,7 @@ module tt_um_rejunity_lgn_mnist (
   localparam INPUTS  = 256;
   localparam OUTPUTS = 4000;
   localparam CATEGORIES = 10;
-  localparam BITS_PER_CATEGORY = 512;
+  localparam BITS_PER_CATEGORY = 255;
   localparam BITS_PER_CATEGORY_SUM = $clog2(BITS_PER_CATEGORY);
   always @(posedge clk) begin : set_inputs
     if (write_enable)
@@ -47,7 +47,6 @@ module tt_um_rejunity_lgn_mnist (
     for (i = 0; i < CATEGORIES; i = i+1) begin : calc_categories
       // sum_bits #(.N(BITS_PER_CATEGORY)) sum_bits(
       //   .y(y_categories[i*BITS_PER_CATEGORY +: BITS_PER_CATEGORY]),
-
       sum_255_bits sum_bits(
         .y(y_categories[i*BITS_PER_CATEGORY +: 255]),
         .sum(sum_categories[i*BITS_PER_CATEGORY_SUM +: BITS_PER_CATEGORY_SUM])
@@ -97,19 +96,14 @@ module sum_511_bits (
     wire [7:0] count1;
     PopCount256 popcount0(.data(y[0*256 +: 256]), .count(count0));
     PopCount256 popcount1(.data(y[1*256 +: 256]), .count(count1));
-    assign sum = count0 + count1;
+    wire unused_msb;
+    assign {unused_msb, sum} = count0 + count1;
 endmodule
 
 module sum_255_bits (
     input wire [255-1:0] y,
     output wire  [8-1:0] sum
 );
-    // wire [7:0] count0;
-    // wire [7:0] count1;
-    // PopCount128 popcount0(.data(y[0*128 +: 128]), .count(count0));
-    // PopCount128 popcount1(.data(y[1*128 +: 128]), .count(count1));
-    // assign sum = count0 + count1;
-
     wire unused_msb;
     PopCount256 popcount256(.data({1'b0, y}), .count({unused_msb, sum}));
 endmodule

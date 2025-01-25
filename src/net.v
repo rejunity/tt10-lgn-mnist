@@ -3,7 +3,7 @@
 module net (
     input  wire [255:0] in,
     output wire [1999:0] out,
-    output wire [5119:0] categories
+    output wire [2549:0] categories
 );
     wire [2000:0] layer_0;
     wire [2000:0] layer_1;
@@ -6013,24 +6013,24 @@ module net (
     assign out[1999] = layer_1[1232] & layer_1[1138]; 
     // Arrange outputs in categories ================================================
     assign categories[199:0] = out[199:0];
-    assign categories[511:200] = 0;
-    assign categories[711:512] = out[399:200];
-    assign categories[1023:712] = 0;
-    assign categories[1223:1024] = out[599:400];
-    assign categories[1535:1224] = 0;
-    assign categories[1735:1536] = out[799:600];
-    assign categories[2047:1736] = 0;
-    assign categories[2247:2048] = out[999:800];
-    assign categories[2559:2248] = 0;
-    assign categories[2759:2560] = out[1199:1000];
-    assign categories[3071:2760] = 0;
-    assign categories[3271:3072] = out[1399:1200];
-    assign categories[3583:3272] = 0;
-    assign categories[3783:3584] = out[1599:1400];
-    assign categories[4095:3784] = 0;
-    assign categories[4295:4096] = out[1799:1600];
-    assign categories[4607:4296] = 0;
-    assign categories[4807:4608] = out[1999:1800];
-    assign categories[5119:4808] = 0;
+    assign categories[254:200] = 0;
+    assign categories[454:255] = out[399:200];
+    assign categories[509:455] = 0;
+    assign categories[709:510] = out[599:400];
+    assign categories[764:710] = 0;
+    assign categories[964:765] = out[799:600];
+    assign categories[1019:965] = 0;
+    assign categories[1219:1020] = out[999:800];
+    assign categories[1274:1220] = 0;
+    assign categories[1474:1275] = out[1199:1000];
+    assign categories[1529:1475] = 0;
+    assign categories[1729:1530] = out[1399:1200];
+    assign categories[1784:1730] = 0;
+    assign categories[1984:1785] = out[1599:1400];
+    assign categories[2039:1985] = 0;
+    assign categories[2239:2040] = out[1799:1600];
+    assign categories[2294:2240] = 0;
+    assign categories[2494:2295] = out[1999:1800];
+    assign categories[2549:2495] = 0;
 
 endmodule
