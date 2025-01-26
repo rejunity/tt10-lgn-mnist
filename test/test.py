@@ -51,7 +51,7 @@ X = \
 # Y =        "../src/baralizm_20250117-183715_acc9336_seed522333_epochs300_dsp128_3x3000_b256_lrm10-1with_dataset.npz"
 # 9K gates, Suggested target density:  0.59
 
-# Y =        "../src/baralizm_20250118-072438_acc9263_seed954361_epochs300_dsp128_3x2500_b256_lrm10-1with_dataset.npz"
+Y =        "../src/baralizm_20250118-072438_acc9263_seed954361_epochs300_dsp128_3x2500_b256_lrm10-1with_dataset.npz"
 # 7.5K gates, Suggested target density: 0.?? (0.49)
 
 # Y =        "../src/baralizm_20250118-065915_acc9141_seed115798_epochs300_dsp128_3x2000_b256_lrm10-1with_dataset.npz"
@@ -60,12 +60,16 @@ X = \
 # With FA/HA, multi-Input combinational cell: 6170 (TargetDensity: 0.705, congestion:  82.75%) (8352 total cells, 3213 ha/fa. Utilisation 26.079 %, wire 1216268)
 # ICESTORM_LC:    6289/   5280   119%
 
-
 # Y =        "../src/binarized_20250124-150213_acc9269_seed521206_epochs300_3x2550_b256_lrm10-1_pass48with_dataset.npz"
 # ICESTORM_LC:    6577/   5280   124%
 
-Y =        "../src/binarized_20250124-152724_acc9449_seed470315_epochs100_3x2550_b256_lrm10-1_pass0with_dataset.npz"
-# ICESTORM_LC:    
+# Y =        "../src/binarized_20250124-152724_acc9449_seed470315_epochs100_3x2550_b256_lrm10-1_pass0with_dataset.npz"
+# 7.7K gates, utilisation 29.008 %, wire: 816369
+# Multi-Input combinational cell 6262
+# Congestion: 54.14%  
+# SavedTargetDensity: 0.3099
+# ICESTORM_LC:    8040/   5280   152%
+
 
 ############################## TEST NETS
 # Y = \
