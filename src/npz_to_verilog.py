@@ -260,6 +260,8 @@ def npz_to_verilog(data, max_layers=-1):
                 alpha = FORCE_TO_POWER_LAW[idx]
             except:
                 alpha = FORCE_TO_POWER_LAW
+            if alpha < 0:
+                continue
             size = len(conn_a[i])
             zipf_floats = np.pow(np.arange(1, inputs[i] + 1), -alpha)
             zipf_probs = zipf_floats / zipf_floats.sum()  # Normalize
