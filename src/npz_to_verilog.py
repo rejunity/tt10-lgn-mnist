@@ -1,7 +1,7 @@
 import sys
 import os
 import numpy as np
-
+from collections.abc import Sequence, Mapping
 
 # DONE: Inject additional pass-through (negate / or) gates on the long connections.
 #       Use keep directive to avoid optimisastion by Yosys.
@@ -18,6 +18,9 @@ RELAY_LONG_CONNECTIONS = False
 
 # ASSUME_CIRCULAR_LAYOUT_FOR_CONNECTION_LENGTH = False
 ASSUME_CIRCULAR_LAYOUT_FOR_CONNECTION_LENGTH = True
+
+# FORCE_TO_POWER_LAW = [.55, 0.1]
+
 NUMBER_OF_CATEGORIES = 10
 OUTPUT_BITS_PER_CATEGORY = 255
 
@@ -203,10 +206,7 @@ def ascii_histogram_compressed(values, bins=64):
     if bins > np.max(values):
         bins = np.max(values) + 1
     counts, _ = np.histogram(values, bins=bins)
-    # print(len(counts), bins, np.max(values))
     counts = np.pad(counts, bins-len(counts))
-    # print(counts)
-    # print(len(counts))
     return ascii_graph(counts)
 
 def load_npz_file(file_name):
@@ -236,6 +236,39 @@ def npz_to_verilog(data, max_layers=-1):
     gates = data['gate_types']
     conn_a = data['connections.A']
     conn_b = data['connections.B']
+
+    if 'inputs' in data:
+        inputs = data['inputs'].dim(-1)
+    else:
+        inputs = max(np.max(conn_a[0]), np.max(conn_b[0]))
+    inputs = [inputs] + [len(g) for g in gates]
+
+    try:
+        print(f"OVER-WRITING conections with random distributed according to power exponent: {FORCE_TO_POWER_LAW}")
+        assert conn_a.shape == conn_b.shape
+        for i in range(len(conn_a)):
+            try:
+                idx = min(i, len(FORCE_TO_POWER_LAW)-1)
+                alpha = FORCE_TO_POWER_LAW[idx]
+            except:
+                alpha = FORCE_TO_POWER_LAW
+            size = len(conn_a[i])
+            zipf_floats = np.pow(np.arange(1, inputs[i] + 1), -alpha)
+            zipf_probs = zipf_floats / zipf_floats.sum()  # Normalize
+            # print(zipf_probs)
+            def wire_stats(conn_a, conn_b, in_count):
+                d = np.abs(conn_a - conn_b)
+                if ASSUME_CIRCULAR_LAYOUT_FOR_CONNECTION_LENGTH:
+                    d[d > in_count // 2] = in_count - d[d > in_count // 2]
+                return np.max(d), np.mean(d)
+            wire_before = wire_stats(conn_a[i], conn_b[i], inputs[i])
+            conn_a[i] = np.random.choice(inputs[i]-1,     size=size)
+            conn_b[i] = np.random.choice(len(zipf_probs), size=size, p=zipf_probs) + conn_a[i]
+            conn_b[i][conn_b[i] >= inputs[i]] -= inputs[i]
+            wire_after  = wire_stats(conn_a[i], conn_b[i], inputs[i])
+            print(f"longest/average before: {int(wire_before[0])}/{int(wire_before[1])} vs now: {int(wire_after[0])}/{int(wire_after[1])}")
+    except:
+        pass
 
     # inject input connections, if the first connectivity layer is missing
     assert len(conn_a) == len(conn_b)
