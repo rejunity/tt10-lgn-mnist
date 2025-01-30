@@ -31,14 +31,14 @@ X = \
 # 16K gates
 
 
-# Y =        "../src/barabasi_20250116-120423_acc8188_seed673186_epochs50_dsp128_8x1300_b256_lrm10-2with_dataset.npz"
+Y =        "../src/barabasi_20250116-120423_acc8188_seed673186_epochs50_dsp128_8x1300_b256_lrm10-2with_dataset.npz"
 # 10K gates
 # Multi-Input combinational cell: 7797
 # Util: 26.044 % [INFO GPL]
 # NewTargetDensity: 0.8221
 # ICESTORM_LC:    4713/   5280    89%   Router1 time 165.76s
 
-Y =        "../src/barabasi_20250116-110050_acc8484_seed742947_epochs50_dsp128_8x1500_b256_lrm4-4with_dataset.npz"
+# Y =        "../src/barabasi_20250116-110050_acc8484_seed742947_epochs50_dsp128_8x1500_b256_lrm4-4with_dataset.npz"
 # 12K gates, Suggested target density: 0.31
 # Multi-Input combinational cell: 9095
 # Util: 30.209 %

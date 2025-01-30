@@ -7,6 +7,7 @@
 
 `ifdef SIM
 `elsif FPGA
+`elsif SYNTH
 `else
 `define USE_HA_FA_CELLS
 `endif

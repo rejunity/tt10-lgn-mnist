@@ -1,7 +1,9 @@
 // Generated from: barabasi_20250116-120423_acc8188_seed673186_epochs50_dsp128_8x1300_b256_lrm10-2with_dataset.npz
+
 module net (
-    input wire  [255:0] in,
-    output wire [1299:0] out
+    input  wire [255:0] in,
+    output wire [1299:0] out,
+    output wire [2549:0] categories
 );
     wire [1300:0] layer_0;
     wire [1300:0] layer_1;
@@ -10419,5 +10421,26 @@ module net (
     assign out[1297] = layer_6[226] & ~layer_6[283]; 
     assign out[1298] = layer_6[360] & ~layer_6[305]; 
     assign out[1299] = layer_6[848] & ~layer_6[962]; 
+    // Arrange outputs in categories ================================================
+    assign categories[129:0] = out[129:0];
+    assign categories[254:130] = 0;
+    assign categories[384:255] = out[259:130];
+    assign categories[509:385] = 0;
+    assign categories[639:510] = out[389:260];
+    assign categories[764:640] = 0;
+    assign categories[894:765] = out[519:390];
+    assign categories[1019:895] = 0;
+    assign categories[1149:1020] = out[649:520];
+    assign categories[1274:1150] = 0;
+    assign categories[1404:1275] = out[779:650];
+    assign categories[1529:1405] = 0;
+    assign categories[1659:1530] = out[909:780];
+    assign categories[1784:1660] = 0;
+    assign categories[1914:1785] = out[1039:910];
+    assign categories[2039:1915] = 0;
+    assign categories[2169:2040] = out[1169:1040];
+    assign categories[2294:2170] = 0;
+    assign categories[2424:2295] = out[1299:1170];
+    assign categories[2549:2425] = 0;
 
 endmodule
