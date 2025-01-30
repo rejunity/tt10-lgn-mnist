@@ -5,7 +5,7 @@ all: $(TOP).rpt $(TOP).bin
 %.json: %.v
 	yosys -p 'synth_ice40 -top top -json $@' $<
 
-icebreaker.json: icebreaker.v ../../src/project.v ../../src/net.v
+icebreaker.json: icebreaker.v ../../src/project.v ../../src/net.v ../../src/popcount.v
 	yosys -p "read_verilog $^; synth_ice40 -top top -json $@; ltp"
 
 %.asc: %.json icebreaker.pcf
