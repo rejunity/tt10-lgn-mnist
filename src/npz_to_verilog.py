@@ -19,9 +19,12 @@ RELAY_LONG_CONNECTIONS = False
 # ASSUME_CIRCULAR_LAYOUT_FOR_CONNECTION_LENGTH = False
 ASSUME_CIRCULAR_LAYOUT_FOR_CONNECTION_LENGTH = True
 
+# FORCE_TO_POWER_LAW = [0.75, 0.55, 0.55]
+# FORCE_TO_POWER_LAW = .55
+FORCE_TO_POWER_LAW = [.55,.55,-1]
 # FORCE_TO_POWER_LAW = [.55, -1]
 # FORCE_TO_POWER_LAW = [.55, 0.1, -1]
-FORCE_TO_POWER_LAW = [-1, -1, 0.1]
+#FORCE_TO_POWER_LAW = [-1, -1, 0.1]
 # FORCE_TO_POWER_LAW = [-1, 0.1, -1]
 # FORCE_TO_POWER_LAW = [.6, 0.2]
 # FORCE_TO_POWER_LAW = [.55, 0.1]
@@ -33,20 +36,20 @@ OUTPUT_BITS_PER_CATEGORY = 255
 def op(gate_type, A, B):
     return [
         f"1'b0",
-        f"{A} & {B}",
-        f"{A} & ~{B}",
-        f"{A}",
-        f"{B} & ~{A}",
-        f"{B}",
-        f"{A} ^ {B}",
-        f"{A} | {B}",
-        f"~({A} | {B})",
-        f"~({A} ^ {B})",
-        f"~{B}",
-        f"~{B} | ({A} & {B})",
-        f"~{A}",
-        f"~{A} | ({A} & {B})",
-        f"~({A} & {B})",
+        f"  {A}  &  {B}",
+        f"  {A}  & ~{B}",
+        f"  {A}",
+        f"  {B}  & ~{A}",
+        f"  {B}",
+        f"  {A}  ^  {B}",
+        f"  {A}  |  {B}",
+        f"~({A}  |  {B})",
+        f"~({A}  ^  {B})",
+        f"~({B})",
+        f"~({B}) | ({A} & {B})",
+        f"~({A})",
+        f"~({A}) | ({A} & {B})",
+        f"~({A}  & {B})",
         f"1'b1"
     ][gate_type]
 
