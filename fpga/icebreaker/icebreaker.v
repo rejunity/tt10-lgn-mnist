@@ -1,3 +1,4 @@
+`define AUTO_SWITCH_ON_TIMER
 
 module top (
     input  CLK,
@@ -36,7 +37,11 @@ module top (
     wire [3:0] index;
     wire [7:0] value;
     tt_um_rejunity_lgn_mnist mnist(
-        .ui_in({BTN1,BTN1,BTN1,BTN1, BTN1,BTN1,BTN1,BTN1}),
+        `ifdef AUTO_SWITCH_ON_TIMER
+            .ui_in({flip,flip,flip,flip, flip,flip,flip,flip}),
+        `else 
+            .ui_in({BTN1,BTN1,BTN1,BTN1, BTN1,BTN1,BTN1,BTN1}),
+        `endif
         .uo_out(value),
         .uio_in({BTN2, 7'h00}),
         .uio_out(index),
