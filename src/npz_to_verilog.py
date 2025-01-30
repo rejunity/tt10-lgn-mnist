@@ -16,6 +16,8 @@ EXPANDED_VERILOG = False
 RELAY_LONG_CONNECTIONS = False
 # RELAY_LONG_CONNECTIONS = 64
 
+# ASSUME_CIRCULAR_LAYOUT_FOR_CONNECTION_LENGTH = False
+ASSUME_CIRCULAR_LAYOUT_FOR_CONNECTION_LENGTH = True
 NUMBER_OF_CATEGORIES = 10
 OUTPUT_BITS_PER_CATEGORY = 255
 
@@ -255,11 +257,19 @@ def npz_to_verilog(data, max_layers=-1):
     print("Layer statistics:")
     print("   ","  _ _   ___ _ _ ")
     print("   ","0&⇒A⇐B⊕||⊕B⇐A⇒&1","   ","0...4..........16..............32.... connection distance .....>64")
+    total_wire = 0
+    total_gates = np.prod(gates.shape)
     conn_distance = np.abs(conn_b - conn_a)
-    for i, g, d in zip(range(len(gates)), gates, conn_distance):
-        print(f"{i:3}", ascii_histogram(g)[0], "   ", ascii_histogram_compressed(d)[0])
+    for i, g, d, x in zip(range(len(gates)), gates, conn_distance, inputs):
+        if ASSUME_CIRCULAR_LAYOUT_FOR_CONNECTION_LENGTH:
+            d[d > x // 2] = x - d[d > x // 2]
+            assert np.all(d >= 0)
+            assert np.all(d <= x // 2)
+        print(f"{i:3}", ascii_histogram(g)[0], "   ", ascii_histogram_compressed(d)[0], "xx", ascii_histogram_compressed(d, bins=6)[0])
+        total_wire += np.sum(d)
     print("   ","0&⇒A⇐B⊕||⊕B⇐A⇒&1")
-
+    print(f"Total wire: {total_wire}, avg: {total_wire//total_gates}")
+    print(f"Total gates: {total_gates}")
     input_count = np.max([np.max(conn_a[0,:]), np.max(conn_b[0,:])]) + 1
     return generate_verilog(input_count, gates, conn_a, conn_b)
 
