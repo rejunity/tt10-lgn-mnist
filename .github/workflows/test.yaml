@@ -1,5 +1,11 @@
 name: test
-on: [push, workflow_dispatch]
+
+on:
+  push:
+    # Comment out (or remove) the following line to run the FPGA workflow on every push:
+    branches: none
+  workflow_dispatch:
+
 jobs:
   test:
     runs-on: ubuntu-24.04
