@@ -1,4 +1,4 @@
-// Generated from: /Users/rej/Dev/TinyTapeout/tt10-lgn-mnist.git/src/binarized_20250124-152724_acc9449_seed470315_epochs100_3x2550_b256_lrm10-1_pass0with_dataset.npz
+// Generated from: binarized_20250124-152724_acc9449_seed470315_epochs100_3x2550_b256_lrm10-1_pass0with_dataset.npz
 
 module net (
     input  wire [255:0] in,

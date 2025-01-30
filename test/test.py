@@ -51,7 +51,7 @@ X = \
 # Y =        "../src/baralizm_20250117-183715_acc9336_seed522333_epochs300_dsp128_3x3000_b256_lrm10-1with_dataset.npz"
 # 9K gates, Suggested target density:  0.59
 
-Y =        "../src/baralizm_20250118-072438_acc9263_seed954361_epochs300_dsp128_3x2500_b256_lrm10-1with_dataset.npz"
+# Y =        "../src/baralizm_20250118-072438_acc9263_seed954361_epochs300_dsp128_3x2500_b256_lrm10-1with_dataset.npz"
 # 7.5K gates, Suggested target density: 0.3 (was 0.49)
 # Multi-Input combinational cell 6483
 # Congestion: 98.86% (fails)
@@ -71,7 +71,7 @@ Y =        "../src/baralizm_20250118-072438_acc9263_seed954361_epochs300_dsp128_
 # TargetDensity: 0.25
 # ICESTORM_LC:    6577/   5280   124%
 
-# Y =        "../src/binarized_20250124-152724_acc9449_seed470315_epochs100_3x2550_b256_lrm10-1_pass0with_dataset.npz"
+Y =        "../src/binarized_20250124-152724_acc9449_seed470315_epochs100_3x2550_b256_lrm10-1_pass0with_dataset.npz"
 # 7.7K gates, utilisation: 29.01%, wire: 816369
 # Multi-Input combinational cell 6262
 # Congestion: 54.14%  
