@@ -45,11 +45,13 @@ module tt_um_rejunity_lgn_mnist (
   genvar i;
   generate
     for (i = 0; i < CATEGORIES; i = i+1) begin : calc_categories
-      // sum_bits #(.N(BITS_PER_CATEGORY)) sum_bits(
-      //   .y(y_categories[i*BITS_PER_CATEGORY +: BITS_PER_CATEGORY]),
-      sum_255_bits sum_bits(
-        .y(y_categories[i*BITS_PER_CATEGORY +: 255]),
-        .sum(sum_categories[i*BITS_PER_CATEGORY_SUM +: BITS_PER_CATEGORY_SUM])
+      `ifdef FPGA
+        sum_bits #(.N(BITS_PER_CATEGORY)) sum_bits(
+      `else
+        sum_255_bits sum_bits(
+      `endif
+          .y(y_categories[i*BITS_PER_CATEGORY +: 255]),
+          .sum(sum_categories[i*BITS_PER_CATEGORY_SUM +: BITS_PER_CATEGORY_SUM])
       );
     end
   endgenerate
