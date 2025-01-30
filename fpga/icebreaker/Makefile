@@ -3,10 +3,10 @@ TOP = icebreaker
 all: $(TOP).rpt $(TOP).bin
 
 %.json: %.v
-	yosys -p 'synth_ice40 -top top -json $@' $<
+	yosys -DSYNTH -p 'synth_ice40 -top top -json $@' $<
 
 icebreaker.json: icebreaker.v ../../src/project.v ../../src/net.v ../../src/popcount.v
-	yosys -p "read_verilog $^; synth_ice40 -top top -json $@; ltp"
+	yosys -DSYNTH -p "read_verilog $^; synth_ice40 -top top -json $@; ltp"
 
 %.asc: %.json icebreaker.pcf
 	nextpnr-ice40 --up5k --freq 12 --asc $@ --pcf icebreaker.pcf --json $<
@@ -24,7 +24,7 @@ icebreaker.json: icebreaker.v ../../src/project.v ../../src/net.v ../../src/popc
 	vvp -N $< +vcd=$@
 
 %_syn.v: %.json
-	yosys -p 'read_json $^; write_verilog $@'
+	yosys -DSYNTH -p 'read_json $^; write_verilog $@'
 
 %_syntb: %_tb.v %_syn.v
 	iverilog -o $@ $^ `yosys-config --datdir/ice40/cells_sim.v`

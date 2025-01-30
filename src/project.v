@@ -45,7 +45,7 @@ module tt_um_rejunity_lgn_mnist (
   genvar i;
   generate
     for (i = 0; i < CATEGORIES; i = i+1) begin : calc_categories
-      `ifdef FPGA
+      `ifdef SYNTH
         sum_bits #(.N(BITS_PER_CATEGORY)) sum_bits(
       `else
         sum_255_bits sum_bits(
