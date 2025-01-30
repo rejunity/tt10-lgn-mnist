@@ -38,12 +38,12 @@ X = \
 # NewTargetDensity: 0.8221
 # ICESTORM_LC:    4713/   5280    89%   Router1 time 165.76s
 
-# Y =        "../src/barabasi_20250116-110050_acc8484_seed742947_epochs50_dsp128_8x1500_b256_lrm4-4with_dataset.npz"
+Y =        "../src/barabasi_20250116-110050_acc8484_seed742947_epochs50_dsp128_8x1500_b256_lrm4-4with_dataset.npz"
 # 12K gates, Suggested target density: 0.31
 # Multi-Input combinational cell: 9095
 # Util: 30.209 %
 # NewTargetDensity: 0.841
-# ICESTORM_LC:    5525/   5280   104%
+# ICESTORM_LC:    5064/   5280   104%
 
 # Y =        "../src/baralizm_20250116-123948_acc9424_seed1022128_epochs50_dsp128_3x4000_b256_lrm5-1with_dataset.npz"
 # 12K gates, Suggested target density: 0.79
@@ -71,7 +71,7 @@ X = \
 # TargetDensity: 0.25
 # ICESTORM_LC:    6577/   5280   124%
 
-Y =        "../src/binarized_20250124-152724_acc9449_seed470315_epochs100_3x2550_b256_lrm10-1_pass0with_dataset.npz"
+# Y =        "../src/binarized_20250124-152724_acc9449_seed470315_epochs100_3x2550_b256_lrm10-1_pass0with_dataset.npz"
 # 7.7K gates, utilisation: 29.01%, wire: 816369
 # Multi-Input combinational cell 6262
 # Congestion: 54.14%  

@@ -1,7 +1,9 @@
-// Generated from: /Users/rej/Dev/TinyTapeout/tt10-lgn-mnist.git/src/barabasi_20250116-110050_acc8484_seed742947_epochs50_dsp128_8x1500_b256_lrm4-4with_dataset.npz
+// Generated from: barabasi_20250116-110050_acc8484_seed742947_epochs50_dsp128_8x1500_b256_lrm4-4with_dataset.npz
+
 module net (
-    input wire  [255:0] in,
-    output wire [1499:0] out
+    input  wire [255:0] in,
+    output wire [1499:0] out,
+    output wire [2549:0] categories
 );
     wire [1500:0] layer_0;
     wire [1500:0] layer_1;
@@ -12019,5 +12021,26 @@ module net (
     assign out[1497] = ~(layer_6[347] | layer_6[274]); 
     assign out[1498] = ~layer_6[476]; 
     assign out[1499] = layer_6[568]; 
+    // Arrange outputs in categories ================================================
+    assign categories[149:0] = out[149:0];
+    assign categories[254:150] = 0;
+    assign categories[404:255] = out[299:150];
+    assign categories[509:405] = 0;
+    assign categories[659:510] = out[449:300];
+    assign categories[764:660] = 0;
+    assign categories[914:765] = out[599:450];
+    assign categories[1019:915] = 0;
+    assign categories[1169:1020] = out[749:600];
+    assign categories[1274:1170] = 0;
+    assign categories[1424:1275] = out[899:750];
+    assign categories[1529:1425] = 0;
+    assign categories[1679:1530] = out[1049:900];
+    assign categories[1784:1680] = 0;
+    assign categories[1934:1785] = out[1199:1050];
+    assign categories[2039:1935] = 0;
+    assign categories[2189:2040] = out[1349:1200];
+    assign categories[2294:2190] = 0;
+    assign categories[2444:2295] = out[1499:1350];
+    assign categories[2549:2445] = 0;
 
 endmodule
