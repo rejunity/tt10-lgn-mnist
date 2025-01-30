@@ -19,7 +19,7 @@ RELAY_LONG_CONNECTIONS = False
 # ASSUME_CIRCULAR_LAYOUT_FOR_CONNECTION_LENGTH = False
 ASSUME_CIRCULAR_LAYOUT_FOR_CONNECTION_LENGTH = True
 
-# FORCE_TO_POWER_LAW = [.55, 0.1]
+FORCE_TO_POWER_LAW = [.55, 0.1]
 
 NUMBER_OF_CATEGORIES = 10
 OUTPUT_BITS_PER_CATEGORY = 255
@@ -185,6 +185,12 @@ endmodule
 """
     return verilog
 
+def additional_meta_info():
+    try:
+        return f"RANDOMIZED connections with power exponent: {FORCE_TO_POWER_LAW}"
+    except:
+        return ""
+
 def ascii_graph(values):
     # Array of characters for tiny histograms
     histogram_chars = np.array([
@@ -324,6 +330,7 @@ if __name__ == "__main__":
 
     data = load_npz_file(npz_file_name)
     verilog = f"// Generated from: {npz_file_name}\n" + \
+        f"// {additional_meta_info()}\n" + \
         npz_to_verilog(data, max_layers)
 
     save_verilog_file(verilog_file_name, verilog)
