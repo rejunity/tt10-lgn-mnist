@@ -44,6 +44,12 @@ def op(gate_type, A, B):
         f"1'b1"
     ][gate_type]
 
+def get_conn_distance(conn_a, conn_b, in_count):
+    d = np.abs(conn_a - conn_b)
+    if ASSUME_CIRCULAR_LAYOUT_FOR_CONNECTION_LENGTH:
+        d[d > in_count // 2] = in_count - d[d > in_count // 2]
+    return d
+
 def generate_verilog(global_inputs, gates, conn_a, conn_b, number_of_categories=NUMBER_OF_CATEGORIES, output_bits_per_category=OUTPUT_BITS_PER_CATEGORY):
     assert len(gates) == len(conn_a) == len(conn_b)
     global_outputs = len(gates[-1])
@@ -71,7 +77,8 @@ def generate_verilog(global_inputs, gates, conn_a, conn_b, number_of_categories=
             input_a = f"{input}[{a}]"
             input_b = f"{input}[{b}]"
             if RELAY_LONG_CONNECTIONS > 0:
-                relay_count = abs(b - a) // RELAY_LONG_CONNECTIONS
+                in_count = len(gates[layer_idx-1]) if layer_idx > 0 else global_inputs
+                relay_count = get_conn_distance(a, b, in_count) // RELAY_LONG_CONNECTIONS
                 for n in range(relay_count):
                     relay = f"far_{layer_idx}_{gate_idx}_{n}"
                     # body += f"    wire [1:0] {relay};"
@@ -257,9 +264,7 @@ def npz_to_verilog(data, max_layers=-1):
             zipf_probs = zipf_floats / zipf_floats.sum()  # Normalize
             # print(zipf_probs)
             def wire_stats(conn_a, conn_b, in_count):
-                d = np.abs(conn_a - conn_b)
-                if ASSUME_CIRCULAR_LAYOUT_FOR_CONNECTION_LENGTH:
-                    d[d > in_count // 2] = in_count - d[d > in_count // 2]
+                d = get_conn_distance(conn_a, conn_b, in_count)
                 return np.max(d), np.mean(d)
             wire_before = wire_stats(conn_a[i], conn_b[i], inputs[i])
             conn_a[i] = np.random.choice(inputs[i]-1,     size=size)
@@ -292,11 +297,10 @@ def npz_to_verilog(data, max_layers=-1):
     print("   ","0&⇒A⇐B⊕||⊕B⇐A⇒&1","   ","0...4..........16..............32.... connection distance .....>64")
     total_wire = 0
     total_gates = np.prod(gates.shape)
-    conn_distance = np.abs(conn_b - conn_a)
-    for i, g, d, x in zip(range(len(gates)), gates, conn_distance, inputs):
+    for i, g, a, b, x in zip(range(len(gates)), gates, conn_a, conn_b, inputs):
+        d = get_conn_distance(a, b, x)
+        assert np.all(d >= 0)
         if ASSUME_CIRCULAR_LAYOUT_FOR_CONNECTION_LENGTH:
-            d[d > x // 2] = x - d[d > x // 2]
-            assert np.all(d >= 0)
             assert np.all(d <= x // 2)
         print(f"{i:3}", ascii_histogram(g)[0], "   ", ascii_histogram_compressed(d)[0], "xx", ascii_histogram_compressed(d, bins=6)[0])
         total_wire += np.sum(d)
