@@ -19,6 +19,7 @@ RELAY_LONG_CONNECTIONS = False
 # ASSUME_CIRCULAR_LAYOUT_FOR_CONNECTION_LENGTH = False
 ASSUME_CIRCULAR_LAYOUT_FOR_CONNECTION_LENGTH = True
 
+# FORCE_RANDOM_GATES = [range(1, 14)]
 # FORCE_TO_POWER_LAW = [.55, 0.1]
 
 NUMBER_OF_CATEGORIES = 10
@@ -249,6 +250,28 @@ def npz_to_verilog(data, max_layers=-1):
     else:
         inputs = max(np.max(conn_a[0]), np.max(conn_b[0]))
     inputs = [inputs] + [len(g) for g in gates]
+
+    try:
+        print(f"OVER-WRITING gates with random distributed: {FORCE_RANDOM_GATES}")
+        for i in range(len(gates)):
+            try:
+                idx = min(i, len(FORCE_RANDOM_GATES)-1)
+                choice = FORCE_RANDOM_GATES[idx]
+            except:
+                choice = FORCE_RANDOM_GATES
+
+            try:
+                choice = np.arange(choice)
+                if choice < 0:
+                    continue
+            except:
+                choice = np.array(choice)
+                pass
+
+            r = np.random.randint(0, len(choice), size=len(gates[i]))
+            gates[i] = choice[r]
+    except:
+        pass
 
     try:
         print(f"OVER-WRITING conections with random distributed according to power exponent: {FORCE_TO_POWER_LAW}")
