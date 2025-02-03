@@ -69,19 +69,19 @@ module top (
         pattern[28] = 8'b00000000;
         pattern[29] = 8'b00000000;
         pattern[30] = 8'b00000000;
-        pattern[31] = 8'b00000000;
-    end 
+        pattern[31] = 8'b00000000;      
+    end
 
 
 
     reg [7:0] current_pattern_byte;
     reg [3:0] latched_index;
 
-    reg [5:0] i;
+    reg [6:0] i;
     always @(posedge CLK) begin
         i <= i + 1;
-        current_pattern_byte <= one_pattern[i];
-        if (i == 16) latched_index <= index;
+        current_pattern_byte <= pattern[i];
+        if (i == 31+4) latched_index <= index;
     end
     
     tt_um_rejunity_lgn_mnist mnist(
