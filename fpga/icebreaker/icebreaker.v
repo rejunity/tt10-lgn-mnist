@@ -38,38 +38,138 @@ module top (
     wire [7:0] value;
     reg [7:0] pattern [0:31];
     initial begin
+        // 5
+        // pattern[0] = 8'b00000000;
+        // pattern[1] = 8'b00000000;
+        // pattern[2] = 8'b00000000;
+        // pattern[3] = 8'b00000000;
+        // pattern[4] = 8'b00000111;
+        // pattern[5] = 8'b11111000;
+        // pattern[6] = 8'b00011111;
+        // pattern[7] = 8'b11111100;
+        // pattern[8] = 8'b00111100;
+        // pattern[9] = 8'b00000000;
+        // pattern[10] = 8'b00110000;
+        // pattern[11] = 8'b00000000;
+        // pattern[12] = 8'b00110000;
+        // pattern[13] = 8'b00000000;
+        // pattern[14] = 8'b00011111;
+        // pattern[15] = 8'b00011000;
+        // pattern[16] = 8'b00001111;
+        // pattern[17] = 8'b11111000;
+        // pattern[18] = 8'b00000000;
+        // pattern[19] = 8'b01111000;
+        // pattern[20] = 8'b00000000;
+        // pattern[21] = 8'b00110000;
+        // pattern[22] = 8'b00000000;
+        // pattern[23] = 8'b11110000;
+        // pattern[24] = 8'b00001111;
+        // pattern[25] = 8'b11110000;
+        // pattern[26] = 8'b00000111;
+        // pattern[27] = 8'b00000000;
+        // pattern[28] = 8'b00000000;
+        // pattern[29] = 8'b00000000;
+        // pattern[30] = 8'b00000000;
+        // pattern[31] = 8'b00000000;
+        // // 6 [18]
+        // pattern[0] = 8'b00000000;
+        // pattern[1] = 8'b00000000;
+        // pattern[2] = 8'b00000000;
+        // pattern[3] = 8'b00000000;
+        // pattern[4] = 8'b00000000;
+        // pattern[5] = 8'b00000000;
+        // pattern[6] = 8'b00000001;
+        // pattern[7] = 8'b11000000;
+        // pattern[8] = 8'b00000111;
+        // pattern[9] = 8'b11110000;
+        // pattern[10] = 8'b00001111;
+        // pattern[11] = 8'b11111000;
+        // pattern[12] = 8'b00011101;
+        // pattern[13] = 8'b11011000;
+        // pattern[14] = 8'b00011111;
+        // pattern[15] = 8'b10110000;
+        // pattern[16] = 8'b00011111;
+        // pattern[17] = 8'b01110000;
+        // pattern[18] = 8'b00001100;
+        // pattern[19] = 8'b11100000;
+        // pattern[20] = 8'b00000001;
+        // pattern[21] = 8'b11000000;
+        // pattern[22] = 8'b00000011;
+        // pattern[23] = 8'b10000000;
+        // pattern[24] = 8'b00000111;
+        // pattern[25] = 8'b00000000;
+        // pattern[26] = 8'b00001110;
+        // pattern[27] = 8'b00000000;
+        // pattern[28] = 8'b00001100;
+        // pattern[29] = 8'b00000000;
+        // pattern[30] = 8'b00001100;
+        // pattern[31] = 8'b00000000;
+        // 3 [20]
         pattern[0] = 8'b00000000;
         pattern[1] = 8'b00000000;
-        pattern[2] = 8'b00000000;
-        pattern[3] = 8'b00000000;
-        pattern[4] = 8'b00000011;
-        pattern[5] = 8'b11100000;
-        pattern[6] = 8'b00000111;
-        pattern[7] = 8'b11110000;
-        pattern[8] = 8'b00000111;
-        pattern[9] = 8'b00111000;
-        pattern[10] = 8'b00001110;
-        pattern[11] = 8'b00011000;
-        pattern[12] = 8'b00001100;
-        pattern[13] = 8'b00011000;
-        pattern[14] = 8'b00001100;
-        pattern[15] = 8'b00011000;
-        pattern[16] = 8'b00001100;
-        pattern[17] = 8'b00011000;
-        pattern[18] = 8'b00011000;
-        pattern[19] = 8'b00011000;
-        pattern[20] = 8'b00011000;
-        pattern[21] = 8'b00111000;
-        pattern[22] = 8'b00001100;
-        pattern[23] = 8'b01110000;
-        pattern[24] = 8'b00001111;
+        pattern[2] = 8'b00000001;
+        pattern[3] = 8'b11100000;
+        pattern[4] = 8'b00000111;
+        pattern[5] = 8'b11110000;
+        pattern[6] = 8'b00001111;
+        pattern[7] = 8'b00110000;
+        pattern[8] = 8'b00001100;
+        pattern[9] = 8'b00000000;
+        pattern[10] = 8'b00001100;
+        pattern[11] = 8'b00000000;
+        pattern[12] = 8'b00001110;
+        pattern[13] = 8'b00000000;
+        pattern[14] = 8'b00001111;
+        pattern[15] = 8'b11110000;
+        pattern[16] = 8'b00000111;
+        pattern[17] = 8'b11110000;
+        pattern[18] = 8'b00000001;
+        pattern[19] = 8'b10000000;
+        pattern[20] = 8'b00000011;
+        pattern[21] = 8'b10110000;
+        pattern[22] = 8'b00000011;
+        pattern[23] = 8'b11110000;
+        pattern[24] = 8'b00000011;
         pattern[25] = 8'b11110000;
-        pattern[26] = 8'b00000111;
+        pattern[26] = 8'b00000011;
         pattern[27] = 8'b11000000;
         pattern[28] = 8'b00000000;
         pattern[29] = 8'b00000000;
         pattern[30] = 8'b00000000;
-        pattern[31] = 8'b00000000;      
+        pattern[31] = 8'b00000000;           
+        // 9 [30]
+        // pattern[0] = 8'b00000001;
+        // pattern[1] = 8'b11000000;
+        // pattern[2] = 8'b00000001;
+        // pattern[3] = 8'b11000000;
+        // pattern[4] = 8'b00000001;
+        // pattern[5] = 8'b11000000;
+        // pattern[6] = 8'b00000011;
+        // pattern[7] = 8'b10000000;
+        // pattern[8] = 8'b00000011;
+        // pattern[9] = 8'b10000000;
+        // pattern[10] = 8'b00000111;
+        // pattern[11] = 8'b00000000;
+        // pattern[12] = 8'b00000111;
+        // pattern[13] = 8'b11100000;
+        // pattern[14] = 8'b00001111;
+        // pattern[15] = 8'b11110000;
+        // pattern[16] = 8'b00001111;
+        // pattern[17] = 8'b00111000;
+        // pattern[18] = 8'b00011100;
+        // pattern[19] = 8'b01110000;
+        // pattern[20] = 8'b00011111;
+        // pattern[21] = 8'b11110000;
+        // pattern[22] = 8'b00001111;
+        // pattern[23] = 8'b11100000;
+        // pattern[24] = 8'b00000111;
+        // pattern[25] = 8'b00000000;
+        // pattern[26] = 8'b00000000;
+        // pattern[27] = 8'b00000000;
+        // pattern[28] = 8'b00000000;
+        // pattern[29] = 8'b00000000;
+        // pattern[30] = 8'b00000000;
+        // pattern[31] = 8'b00000000;           
     end
 
 
@@ -81,8 +181,21 @@ module top (
     always @(posedge CLK) begin
         i <= i + 1;
         current_pattern_byte <= pattern[i];
-        if (i == 31+4) latched_index <= index;
+        if (i == 31+3) latched_index <= index;
     end
+    // true 5 | 6 | 3 | 9
+    //----------------------
+    // -2 ~ ? | 4 |   | 
+    // +0 ~ 5 | 6 | 1 | 9
+    // +1 ~ ? | 0 |   |
+    // +2 ~ 5 | 6 | 1 | 9
+    // +3 ~ 2 | ? | 2 |
+    // +4 ~ 5 | 6 | 9 | 9
+    // +5 ~ 2 | ? | 2 |
+    // +6 ~ 5 | 1 | 9 | 6
+    // +7 ~ 2 | ? |   |
+    // +8 ~ 1 | 2 | 6 | 6 
+    // +9 ~ 1
     
     tt_um_rejunity_lgn_mnist mnist(
         .ui_in(current_pattern_byte),
