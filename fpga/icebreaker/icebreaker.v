@@ -1,4 +1,4 @@
-`define AUTO_SWITCH_ON_TIMER
+// `define AUTO_SWITCH_ON_TIMER
 
 module top (
     input  CLK,
@@ -36,12 +36,56 @@ module top (
 
     wire [3:0] index;
     wire [7:0] value;
+    reg [7:0] pattern [0:31];
+    initial begin
+        pattern[0] = 8'b00000000;
+        pattern[1] = 8'b00000000;
+        pattern[2] = 8'b00000000;
+        pattern[3] = 8'b00000000;
+        pattern[4] = 8'b00000011;
+        pattern[5] = 8'b11100000;
+        pattern[6] = 8'b00000111;
+        pattern[7] = 8'b11110000;
+        pattern[8] = 8'b00000111;
+        pattern[9] = 8'b00111000;
+        pattern[10] = 8'b00001110;
+        pattern[11] = 8'b00011000;
+        pattern[12] = 8'b00001100;
+        pattern[13] = 8'b00011000;
+        pattern[14] = 8'b00001100;
+        pattern[15] = 8'b00011000;
+        pattern[16] = 8'b00001100;
+        pattern[17] = 8'b00011000;
+        pattern[18] = 8'b00011000;
+        pattern[19] = 8'b00011000;
+        pattern[20] = 8'b00011000;
+        pattern[21] = 8'b00111000;
+        pattern[22] = 8'b00001100;
+        pattern[23] = 8'b01110000;
+        pattern[24] = 8'b00001111;
+        pattern[25] = 8'b11110000;
+        pattern[26] = 8'b00000111;
+        pattern[27] = 8'b11000000;
+        pattern[28] = 8'b00000000;
+        pattern[29] = 8'b00000000;
+        pattern[30] = 8'b00000000;
+        pattern[31] = 8'b00000000;
+    end 
+
+
+
+    reg [7:0] current_pattern_byte;
+    reg [3:0] latched_index;
+
+    reg [5:0] i;
+    always @(posedge CLK) begin
+        i <= i + 1;
+        current_pattern_byte <= one_pattern[i];
+        if (i == 16) latched_index <= index;
+    end
+    
     tt_um_rejunity_lgn_mnist mnist(
-        `ifdef AUTO_SWITCH_ON_TIMER
-            .ui_in({flip,flip,flip,flip, flip,flip,flip,flip}),
-        `else 
-            .ui_in({BTN1,BTN1,BTN1,BTN1, BTN1,BTN1,BTN1,BTN1}),
-        `endif
+        .ui_in(current_pattern_byte),
         .uo_out(value),
         .uio_in({BTN2, 7'h00}),
         .uio_out(index),
@@ -52,7 +96,7 @@ module top (
     );
 
     seven_segment seven_segment(
-        .in(index),
+        .in(latched_index),
         .out(pmod_1b)
     );
 
