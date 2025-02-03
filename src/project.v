@@ -19,6 +19,20 @@ module tt_um_rejunity_lgn_mnist (
   assign uio_oe  = 8'b0111_1111; // BIDIR in output mode, except "write_enable" the highest bit 
   wire write_enable = 1; // ~uio_in[7];
 
+  reg [15:0] digit_array [0:15];
+  initial begin
+    $readmemh("digit.hex", digit_array);
+  end
+  // Flatten memory into a single 256-bit bus if desired
+  wire [255:0] digit_flat;
+  genvar i;
+  generate
+    for (i = 0; i < 16; i = i + 1) begin : flatten
+      assign digit_flat[i*16 +: 16] = digit_array[i];
+    end
+  endgenerate
+
+
   // List all unused inputs to prevent warnings
   wire _unused = &{ena, rst_n, 1'b0};
 
@@ -27,9 +41,22 @@ module tt_um_rejunity_lgn_mnist (
   localparam CATEGORIES = 10;
   localparam BITS_PER_CATEGORY = 255;
   localparam BITS_PER_CATEGORY_SUM = $clog2(BITS_PER_CATEGORY);
-  always @(posedge clk) begin : set_inputs
-    if (write_enable)
-      x <= {x[INPUTS-8-1:0], ui_in[7:0]};
+  // Revert to shifting 8 bits per clock, just like the old code, 
+  // but read those 8 bits from digit_flat instead of ui_in.
+  reg [4:0] shift_idx;  // goes from 0..31
+  always @(posedge clk) begin
+    if (!rst_n) begin
+      shift_idx <= 0;
+      x <= 0;
+    end else if (write_enable) begin
+      if (shift_idx < 32) begin
+        // Extract the next byte from digit_flat
+        // e.g. shift_idx=0 => digit_flat[7:0], shift_idx=1 => digit_flat[15:8], etc.
+        x <= { x[INPUTS-8-1:0], digit_flat[shift_idx*8 +: 8] };
+        shift_idx <= shift_idx + 1;
+      end
+      // else do nothing; we've already loaded all 256 bits
+    end
   end
 
   reg   [INPUTS-1:0] x;
