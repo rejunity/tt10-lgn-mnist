@@ -178,7 +178,14 @@ module top (
     reg [3:0] latched_index;
 
     reg [6:0] i;
-    always @(posedge CLK) begin
+
+    wire slow_clk;
+    clock_div2 clock_div2(
+        .clk_12MHz(CLK),
+        .clk_6MHz(slow_clk)
+    );
+
+    always @(posedge slow_clk) begin
         i <= i + 1;
         current_pattern_byte <= pattern[i];
         if (i == 31+2) latched_index <= index;
@@ -204,7 +211,7 @@ module top (
         .uio_out(index),
         .uio_oe(),
         .ena(1'b1),
-        .clk(CLK),
+        .clk(slow_clk),
         .rst_n(BTN_N)
     );
 
@@ -257,4 +264,45 @@ module seven_segment (
         default:    out = ~7'b0111111; // "0"
         endcase
     end
+endmodule
+
+//
+// Clock divider(s) for sub 12MHz execution
+//
+
+module clock_pll (
+    input  wire clk_12MHz,   // Input: 12 MHz clock
+    output wire clk_6MHz,    // Output: 6 MHz clock (divided by 2)
+    output wire succeeded
+);    
+    SB_PLL40_PAD #(
+        .FEEDBACK_PATH("SIMPLE"),
+        .DIVR(4'b0000),       // Reference clock divider (÷1)
+        .DIVF(7'b0000010),    // Multiplier (x2)
+        .DIVQ(3'b011),        // Divider (÷4) → 12MHz * (2/4) = 6MHz
+        .FILTER_RANGE(3'b001)
+    ) pll_inst (
+        .PACKAGEPIN(clk_12MHz),
+        .PLLOUTCORE(clk_6MHz),
+        .LOCK(succeeded),
+        .BYPASS(1'b0),
+        .RESETB(1'b1)
+    );
+endmodule
+
+module clock_div2 (
+    input  wire clk_12MHz,
+    output wire clk_6MHz
+);
+    wire global_clk_buffer;
+
+    reg clk_divider;
+    always @(posedge clk_12MHz) clk_divider <= ~clk_divider;
+
+    SB_GB clk_buffer (
+        .USER_SIGNAL_TO_GLOBAL_BUFFER(clk_divider),
+        .GLOBAL_BUFFER_OUTPUT(global_clk_buffer)
+    );
+
+    assign clk_6MHz = global_clk_buffer;
 endmodule

@@ -12,7 +12,7 @@ $(TOP).bin: $(TOP).asc digit.hex
 $(TOP).asc: $(TOP).json digit.hex
 
 %.asc: %.json icebreaker.pcf
-	nextpnr-ice40 --up5k --freq 12 --asc $@ --pcf icebreaker.pcf --json $<
+	nextpnr-ice40 --package sg48 --up5k --asc $@ --pcf icebreaker.pcf --pre-pack clocks.py --json $<
 
 %.bin: %.asc
 	icepack $< $@

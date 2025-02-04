@@ -1,0 +1,1 @@
+ctx.addClock("slow_clk", 6)
