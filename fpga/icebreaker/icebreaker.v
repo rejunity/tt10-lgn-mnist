@@ -111,10 +111,9 @@ module top (
         pattern9[5'd30] = 8'b00000000; pattern9[5'd31] = 8'b00000000;           
     end
 
-
-
     reg [7:0] current_pattern_byte;
     reg [3:0] latched_index;
+    reg [7:0] latched_value;
     reg [4:0] i;
 
     wire slow_clk;
@@ -125,9 +124,11 @@ module top (
 
     always @(posedge slow_clk) begin
         current_pattern_byte <= (flip) ? pattern5[i] : pattern3[i];
+        // current_pattern_byte <= (flip) ? pattern5[i] : pattern6[i];
+        // current_pattern_byte <= (flip) ? 8'hFF : pattern3[i];
+        if (i == 1) latched_index <= index;
+        if (i == 1) latched_value <= value;
         i <= i + 1;
-        current_pattern_byte <= pattern[i];
-        if (i == 31+2) latched_index <= index;
     end
     // true 5 | 6 | 3 | 9
     //----------------------
@@ -159,7 +160,7 @@ module top (
         .out(pmod_1b)
     );
 
-    assign pmod_1a = ~{value[3:0], value[7:4]};
+    assign pmod_1a = ~{latched_value[3:0], latched_value[7:4]};
 
     // tt_um_rejunity_lgn_mnist mnist(
     //     .ui_in(pmod_1a),
