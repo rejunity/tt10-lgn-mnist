@@ -7,6 +7,7 @@ TOPLEVEL_LANG ?= verilog
 SRC_DIR = $(PWD)/../src
 PROJECT_SOURCES = project.v net.v popcount.v
 
+export SRC_DIR
 ifneq ($(GATES),yes)
 
 # RTL simulation:

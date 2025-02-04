@@ -8,6 +8,26 @@ import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles
 
+
+### LOAD Y FROM NET.V WHEN Y UNDEFINED
+try:
+    Y
+except NameError:
+    src_dir = os.getenv("SRC_DIR")
+    if not src_dir:
+        raise EnvironmentError("SRC_DIR is not set.")
+    net_v_path = os.path.join(os.path.abspath(src_dir), "net.v")
+    if not os.path.exists(net_v_path):
+        raise FileNotFoundError(f"File not found: {net_v_path}")
+    with open(net_v_path, "r") as file:
+        first_net_v_line = file.readline().strip()
+    prefix = "// Generated from: "
+    if first_net_v_line.startswith(prefix):
+        Y = os.path.join(os.path.abspath(src_dir),first_net_v_line[len(prefix):])
+    else:
+        raise IOError("Unexpected net.v first line")
+
+
 gates_value = os.getenv('GATES')
 GATE_LEVEL_SIMULATION = not gates_value in (None, "no")
 print("GATES", GATE_LEVEL_SIMULATION)
@@ -31,7 +51,7 @@ X = \
 # 16K gates
 
 
-# Y =        "../src/barabasi_20250116-120423_acc8188_seed673186_epochs50_dsp128_8x1300_b256_lrm10-2with_dataset.npz"
+# Y =        "../src/binarized_20250122-110005_acc9041_seed876599_epochs300_3x1300_b256_lrm10-1with_dataset.npz"
 # 10K gates
 # Multi-Input combinational cell: 7797
 # Util: 26.044 % [INFO GPL]
@@ -134,8 +154,8 @@ Y =        "../src/binarized_20250122-110005_acc9041_seed876599_epochs300_3x1300
 ### Load test data, if Y contains file name ###################################
 if isinstance(Y, str): 
     data = np.load(Y)
-    X = data["input"]
-    Y = data["output"]
+    X = data["input"][20:]
+    Y = data["output"][20:]
     print(X.shape, Y.shape)
 ###############################################################################
 
