@@ -115,8 +115,7 @@ module top (
 
     reg [7:0] current_pattern_byte;
     reg [3:0] latched_index;
-
-    reg [6:0] i;
+    reg [4:0] i;
 
     wire slow_clk;
     clock_div2 clock_div2(
