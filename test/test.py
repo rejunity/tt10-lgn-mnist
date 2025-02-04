@@ -31,7 +31,7 @@ X = \
 # 16K gates
 
 
-Y =        "../src/barabasi_20250116-120423_acc8188_seed673186_epochs50_dsp128_8x1300_b256_lrm10-2with_dataset.npz"
+# Y =        "../src/barabasi_20250116-120423_acc8188_seed673186_epochs50_dsp128_8x1300_b256_lrm10-2with_dataset.npz"
 # 10K gates
 # Multi-Input combinational cell: 7797
 # Util: 26.044 % [INFO GPL]
@@ -77,6 +77,8 @@ Y =        "../src/barabasi_20250116-120423_acc8188_seed673186_epochs50_dsp128_8
 # Congestion: 54.14%  
 # SavedTargetDensity: 0.3099
 # ICESTORM_LC:    8040/   5280   152%
+
+Y =        "../src/binarized_20250122-110005_acc9041_seed876599_epochs300_3x1300_b256_lrm10-1with_dataset.npz"
 
 
 ############################## TEST NETS
