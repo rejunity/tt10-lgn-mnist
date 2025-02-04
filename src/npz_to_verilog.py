@@ -203,14 +203,19 @@ def ascii_graph(values):
     indices[percentages < 1] = 0
     return "".join(histogram_chars[indices]), percentages
 
-def ascii_histogram(values, bins=16):
-    values = np.hstack([values, np.arange(bins)])
-    counts, _ = np.histogram(values, bins=bins)
+def ascii_histogram(values, size=16):
+    values = np.copy(values)
+    values[values >= size] = size-1
+    counts = np.zeros(size, dtype=int)
+    for v in range(size):
+        counts[v] = len(values[values == v])
+    # unique, counts_vals = np.unique(values, return_counts=True)
+    # counts[unique] = counts_vals
     return ascii_graph(counts)
 
-def ascii_histogram_compressed(values, bins=64):
-    values = np.hstack([values, 0, 1])
-    values[values >= np.mean(values) * 2] = np.mean(values) * 2
+def ascii_histogram_compressed(values, bins=8):
+    # values = np.hstack([values, 0, 1])
+    # values[values >= np.mean(values) * 2] = np.mean(values) * 2
     if bins > np.max(values):
         bins = np.max(values) + 1
     counts, _ = np.histogram(values, bins=bins)
@@ -325,7 +330,7 @@ def npz_to_verilog(data, max_layers=-1):
         assert np.all(d >= 0)
         if ASSUME_CIRCULAR_LAYOUT_FOR_CONNECTION_LENGTH:
             assert np.all(d <= x // 2)
-        print(f"{i:3}", ascii_histogram(g)[0], "   ", ascii_histogram_compressed(d)[0], "xx", ascii_histogram_compressed(d, bins=6)[0])
+        print(f"{i:3}", ascii_histogram(g, size=16)[0], "   ", ascii_histogram(d, size=64)[0], "xx", ascii_histogram_compressed(d, bins=8)[0])
         total_wire += np.sum(d)
     print("   ","0&⇒A⇐B⊕||⊕B⇐A⇒&1")
     print(f"Total wire: {total_wire}, avg: {total_wire//total_gates}")
