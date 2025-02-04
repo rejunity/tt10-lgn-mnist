@@ -296,11 +296,9 @@ def npz_to_verilog(data, max_layers=-1):
                 alpha = FORCE_TO_POWER_LAW
             size = len(conn_a[i])
             zipf_floats = np.pow(np.arange(1, inputs[i] + 1), -alpha)
+            cutoff = np.max(zipf_floats) * 0.03 # 3 percent cutoff for long tail distribution of random values
+            zipf_floats[zipf_floats <= cutoff] = 0
             zipf_probs = zipf_floats / zipf_floats.sum()  # Normalize
-            # print(zipf_probs)
-            def wire_stats(conn_a, conn_b, in_count):
-                d = get_conn_distance(conn_a, conn_b, in_count)
-                return np.max(d), np.mean(d)
             wire_before = wire_stats(conn_a[i], conn_b[i], inputs[i])
             conn_a[i] = np.random.choice(inputs[i]-1,     size=size)
             conn_b[i] = np.random.choice(len(zipf_probs), size=size, p=zipf_probs) + conn_a[i]
