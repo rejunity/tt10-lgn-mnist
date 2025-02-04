@@ -16,6 +16,9 @@ EXPANDED_VERILOG = False
 RELAY_LONG_CONNECTIONS = False
 # RELAY_LONG_CONNECTIONS = 64
 
+LIMIT_LONG_CONNECTIONS = False
+# LIMIT_LONG_CONNECTIONS = 128
+
 # ASSUME_CIRCULAR_LAYOUT_FOR_CONNECTION_LENGTH = False
 ASSUME_CIRCULAR_LAYOUT_FOR_CONNECTION_LENGTH = True
 
@@ -278,6 +281,10 @@ def npz_to_verilog(data, max_layers=-1):
     except:
         pass
 
+    def wire_stats(conn_a, conn_b, in_count):
+        d = get_conn_distance(conn_a, conn_b, in_count)
+        return np.max(d), np.mean(d)
+
     try:
         print(f"OVER-WRITING conections with random distributed according to power exponent: {FORCE_TO_POWER_LAW}")
         assert conn_a.shape == conn_b.shape
@@ -308,6 +315,26 @@ def npz_to_verilog(data, max_layers=-1):
     if (gates.shape[0] > conn_a.shape[0]):
         conn_a = np.vstack((np.zeros(len(gates[0]), dtype=conn_a.dtype), conn_a))
         conn_b = np.vstack((np.ones (len(gates[0]), dtype=conn_b.dtype), conn_b))
+
+    # (optional) limit long connections
+    if LIMIT_LONG_CONNECTIONS > 0:
+        print(f"CLAMPING conections length to: {LIMIT_LONG_CONNECTIONS}")
+        for a, b, x in zip(conn_a, conn_b, inputs):
+            wire_before = wire_stats(a, b, x)
+            d = get_conn_distance(a, b, x) - LIMIT_LONG_CONNECTIONS
+            mask_right = np.logical_and(d >= 0, a < b)
+            mask_left = np.logical_and(d >= 0, a > b)
+            assert np.all(~(mask_right & mask_left))
+            b[mask_right] = a[mask_right] + LIMIT_LONG_CONNECTIONS
+            b[mask_left]  = a[mask_left]  - LIMIT_LONG_CONNECTIONS
+            if ASSUME_CIRCULAR_LAYOUT_FOR_CONNECTION_LENGTH:
+                b[b >= x] -= x
+                b[b < 0] += x
+            assert np.all(b >= 0)
+            assert np.all(b < x)
+            wire_after  = wire_stats(a, b, x)
+            print(f"longest/average before: {int(wire_before[0])}/{int(wire_before[1])} vs now: {int(wire_after[0])}/{int(wire_after[1])}")
+
 
     # (optional) cut layers above max_layers
     assert len(gates) == len(conn_a) == len(conn_b)
