@@ -103,3 +103,12 @@ set_io -nowarn vga_6bpp_g[0]    48
 set_io -nowarn vga_6bpp_g[1]     2
 set_io -nowarn vga_6bpp_b[0]    46
 set_io -nowarn vga_6bpp_b[1]    47
+
+set_io SCLK  45
+set_io MOSI  2
+set_io CS    4
+
+set_io DC    3
+set_io RES   48
+set_io VBATC 46
+set_io VDDC  44

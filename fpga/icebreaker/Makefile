@@ -5,14 +5,14 @@ all: $(TOP).rpt $(TOP).bin
 %.json: %.v
 	yosys -DSYNTH -p 'synth_ice40 -top top -json $@' $<
 
-icebreaker.json: icebreaker.v ../../src/project.v ../../src/net.v ../../src/popcount.v
+icebreaker.json: icebreaker.v ../../src/project.v ../../src/net.v ../../src/popcount.v oled.v
 	yosys -DSYNTH -p "read_verilog $^; synth_ice40 -top top -json $@; ltp"
 
 $(TOP).bin: $(TOP).asc digit.hex
 $(TOP).asc: $(TOP).json digit.hex
 
 %.asc: %.json icebreaker.pcf
-	nextpnr-ice40 --up5k --freq 12 --asc $@ --pcf icebreaker.pcf --json $<
+	nextpnr-ice40 --up5k --freq 6 --asc $@ --pcf icebreaker.pcf --json $<
 
 %.bin: %.asc
 	icepack $< $@
