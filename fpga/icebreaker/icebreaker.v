@@ -75,7 +75,7 @@ module top (
         pattern6[5'd26] = 8'b00001110; pattern6[5'd27] = 8'b00000000;
         pattern6[5'd28] = 8'b00001100; pattern6[5'd29] = 8'b00000000;
         pattern6[5'd30] = 8'b00001100; pattern6[5'd31] = 8'b00000000;
-        // 3 [20] -- does not work
+        // 3 [20]
         pattern3[5'd00] = 8'b00000000; pattern3[5'd01] = 8'b00000000;
         pattern3[5'd02] = 8'b00000001; pattern3[5'd03] = 8'b11100000;
         pattern3[5'd04] = 8'b00000111; pattern3[5'd05] = 8'b11110000;
@@ -160,7 +160,7 @@ module top (
         .out(pmod_1b)
     );
 
-    assign pmod_1a = ~{latched_value[3:0], latched_value[7:4]};
+    // assign pmod_1a = ~{latched_value[3:0], latched_value[7:4]};
 
     // tt_um_rejunity_lgn_mnist mnist(
     //     .ui_in(pmod_1a),
@@ -173,6 +173,14 @@ module top (
     //     .rst_n(BTN_N)
     // );
 
+    oled_screen_128x32 screen1(
+        .clk(CLK),
+        .io_sclk(pmod_1a[3]),
+        .io_sdin(pmod_1a[1]),
+        .io_cs(pmod_1a[0]),
+        .io_dc(pmod_1a[4]),
+        .io_reset(pmod_1a[5])
+    );
 
 endmodule
 
