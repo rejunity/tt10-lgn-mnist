@@ -22,21 +22,74 @@ module top (
     output wire[7:0] pmod_1a,
     output wire[7:0] pmod_1b
 );
+    localparam IMAGE_COUNT = 450;
+    localparam CYCLES_TO_WAIT_BETWEEN_FLIPS = 12*1000*1000 / 10;
+
     reg [31:0] counter;
     reg flip;
     always @(posedge CLK) begin
         counter <= counter + 1;
-        if (counter == 12*1000*1000) begin
+        if (counter == CYCLES_TO_WAIT_BETWEEN_FLIPS) begin
             flip <= ~flip;
             counter <= 0;
         end
     end
 
-    assign LED1 = BTN1;
-    assign LED2 = flip;
+    assign LED1 = failure && flip;
+    assign LED2 = success || flip;
+    assign {LED5, LED3, LED4} = {success, success, success};
 
-    wire [3:0] index;
-    wire [7:0] value;
+
+    // reg [15:0] patterns[0:16*16-1];
+    reg [7:0] patterns[0:IMAGE_COUNT*16*2-1];
+    initial begin
+        $readmemb("../../src/test_images.mem", patterns);
+    end
+
+    reg success = 0;
+    reg failure = 0;
+    // assign LED_RED_N = flip;//!failure;
+    // assign LED_GRN_N = flip;//!success;
+
+    reg  [3:0] dec_digit_counter;
+    reg  [$clog2(IMAGE_COUNT):0]     digit_counter;
+    always @(posedge CLK) begin
+        if (!failure && counter == CYCLES_TO_WAIT_BETWEEN_FLIPS) begin
+            if (digit_counter > 0 && dec_digit_counter != latched_index)
+                failure <= 1;
+
+            dec_digit_counter <= dec_digit_counter + 1;
+                digit_counter <=     digit_counter + 1;
+            if (dec_digit_counter == 9)
+                dec_digit_counter <= 0;
+            if (   digit_counter == IMAGE_COUNT-1) begin
+                dec_digit_counter <= 0;
+                    digit_counter <= 0;
+                success = 1;
+            end
+        end
+    end
+
+    reg  [4:0] pattern_counter;
+    always @(posedge slow_clk) begin
+        if (pattern_counter == 1) begin
+            latched_index <= index;
+            latched_value <= value;
+        end
+        pattern_counter <= pattern_counter + 1'b1;
+    end
+
+    // reg  [7:0] current_pattern_byte;
+    // wire [7:0] current_pattern_byte = loaded_data[8*pattern_counter[0] +: 8];
+    // wire [7:0] current_pattern_byte = loaded_data >> ~pattern_counter[0];
+    wire [7:0] current_pattern_byte = loaded_data;
+    // reg  [15:0] loaded_data;
+    reg  [7:0] loaded_data;
+    wire [15:0] pattern_addr = { digit_counter, pattern_counter };
+    always @(posedge slow_clk) begin
+        loaded_data <= patterns[pattern_addr];
+    end
+
     reg [7:0] pattern5[0:31];
     reg [7:0] pattern6[0:31];
     reg [7:0] pattern3[0:31];
@@ -112,7 +165,8 @@ module top (
         pattern9[5'd30] = 8'b00000000; pattern9[5'd31] = 8'b00000000;           
     end
 
-    reg [7:0] current_pattern_byte;
+    wire [3:0] index;
+    wire [7:0] value;
     reg [3:0] latched_index;
     reg [7:0] latched_value;
     reg [4:0] i;
@@ -122,15 +176,16 @@ module top (
         .clk_12MHz(CLK),
         .clk_6MHz(slow_clk)
     );
+    // wire slow_clk = CLK;
 
-    always @(posedge slow_clk) begin
-        current_pattern_byte <= (flip) ? pattern5[i] : pattern3[i];
-        // current_pattern_byte <= (flip) ? pattern5[i] : pattern6[i];
-        // current_pattern_byte <= (flip) ? 8'hFF : pattern3[i];
-        if (i == 1) latched_index <= index;
-        if (i == 1) latched_value <= value;
-        i <= i + 1;
-    end
+    // always @(posedge slow_clk) begin
+    //     current_pattern_byte <= (flip) ? pattern5[i] : pattern3[i];
+    //     // current_pattern_byte <= (flip) ? pattern5[i] : pattern6[i];
+    //     // current_pattern_byte <= (flip) ? 8'hFF : pattern3[i];
+    //     if (i == 1) latched_index <= index;
+    //     if (i == 1) latched_value <= value;
+    //     i <= i + 1;
+    // end
     // true 5 | 6 | 3 | 9
     //----------------------
     // -2 ~ ? | 4 |   | 
