@@ -1,3 +1,4 @@
+`default_nettype none
 // `define AUTO_SWITCH_ON_TIMER
 
 module top (
