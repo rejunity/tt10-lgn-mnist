@@ -18,7 +18,7 @@ module top (
     output wire[7:0] pmod_1a,
     output wire[7:0] pmod_1b
 );
-    localparam IMAGE_COUNT = 450;
+    localparam IMAGE_COUNT = 480; // maximum that fits in iCE40 UP5K FPGA
     localparam CYCLES_TO_WAIT_BETWEEN_FLIPS = 12*1000*1000 / 10;
 
     reg [31:0] counter;
