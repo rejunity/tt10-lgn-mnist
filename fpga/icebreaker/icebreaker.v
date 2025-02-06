@@ -15,10 +15,6 @@ module top (
     output LED4,
     output LED5,
 
-    output LED_RED_N,
-    output LED_GRN_N,
-    output LED_BLU_N,
-
     output wire[7:0] pmod_1a,
     output wire[7:0] pmod_1b
 );
@@ -40,16 +36,14 @@ module top (
     assign {LED5, LED3, LED4} = {success, success, success};
 
 
-    // reg [15:0] patterns[0:16*16-1];
-    reg [7:0] patterns[0:IMAGE_COUNT*16*2-1];
+    localparam BYTES_PER_IMAGE = 16*2;
+    reg [7:0] patterns[0:IMAGE_COUNT*BYTES_PER_IMAGE-1];
     initial begin
         $readmemb("../../src/test_images.mem", patterns);
     end
 
     reg success = 0;
     reg failure = 0;
-    // assign LED_RED_N = flip;//!failure;
-    // assign LED_GRN_N = flip;//!success;
 
     reg  [3:0] dec_digit_counter;
     reg  [$clog2(IMAGE_COUNT):0]     digit_counter;
@@ -79,129 +73,25 @@ module top (
         pattern_counter <= pattern_counter + 1'b1;
     end
 
-    // reg  [7:0] current_pattern_byte;
-    // wire [7:0] current_pattern_byte = loaded_data[8*pattern_counter[0] +: 8];
-    // wire [7:0] current_pattern_byte = loaded_data >> ~pattern_counter[0];
-    wire [7:0] current_pattern_byte = loaded_data;
-    // reg  [15:0] loaded_data;
     reg  [7:0] loaded_data;
     wire [15:0] pattern_addr = { digit_counter, pattern_counter };
     always @(posedge slow_clk) begin
         loaded_data <= patterns[pattern_addr];
     end
 
-    reg [7:0] pattern5[0:31];
-    reg [7:0] pattern6[0:31];
-    reg [7:0] pattern3[0:31];
-    reg [7:0] pattern9[0:31];
-    initial begin
-        // 5
-        pattern5[5'd00] = 8'b00000000; pattern5[5'd01] = 8'b00000000;
-        pattern5[5'd02] = 8'b00000000; pattern5[5'd03] = 8'b00000000;
-        pattern5[5'd04] = 8'b00000111; pattern5[5'd05] = 8'b11111000;
-        pattern5[5'd06] = 8'b00011111; pattern5[5'd07] = 8'b11111100;
-        pattern5[5'd08] = 8'b00111100; pattern5[5'd09] = 8'b00000000;
-        pattern5[5'd10] = 8'b00110000; pattern5[5'd11] = 8'b00000000;
-        pattern5[5'd12] = 8'b00110000; pattern5[5'd13] = 8'b00000000;
-        pattern5[5'd14] = 8'b00011111; pattern5[5'd15] = 8'b00011000;
-        pattern5[5'd16] = 8'b00001111; pattern5[5'd17] = 8'b11111000;
-        pattern5[5'd18] = 8'b00000000; pattern5[5'd19] = 8'b01111000;
-        pattern5[5'd20] = 8'b00000000; pattern5[5'd21] = 8'b00110000;
-        pattern5[5'd22] = 8'b00000000; pattern5[5'd23] = 8'b11110000;
-        pattern5[5'd24] = 8'b00001111; pattern5[5'd25] = 8'b11110000;
-        pattern5[5'd26] = 8'b00000111; pattern5[5'd27] = 8'b00000000;
-        pattern5[5'd28] = 8'b00000000; pattern5[5'd29] = 8'b00000000;
-        pattern5[5'd30] = 8'b00000000; pattern5[5'd31] = 8'b00000000;
-        // 6 [18]
-        pattern6[5'd00] = 8'b00000000; pattern6[5'd01] = 8'b00000000;
-        pattern6[5'd02] = 8'b00000000; pattern6[5'd03] = 8'b00000000;
-        pattern6[5'd04] = 8'b00000000; pattern6[5'd05] = 8'b00000000;
-        pattern6[5'd06] = 8'b00000001; pattern6[5'd07] = 8'b11000000;
-        pattern6[5'd08] = 8'b00000111; pattern6[5'd09] = 8'b11110000;
-        pattern6[5'd10] = 8'b00001111; pattern6[5'd11] = 8'b11111000;
-        pattern6[5'd12] = 8'b00011101; pattern6[5'd13] = 8'b11011000;
-        pattern6[5'd14] = 8'b00011111; pattern6[5'd15] = 8'b10110000;
-        pattern6[5'd16] = 8'b00011111; pattern6[5'd17] = 8'b01110000;
-        pattern6[5'd18] = 8'b00001100; pattern6[5'd19] = 8'b11100000;
-        pattern6[5'd20] = 8'b00000001; pattern6[5'd21] = 8'b11000000;
-        pattern6[5'd22] = 8'b00000011; pattern6[5'd23] = 8'b10000000;
-        pattern6[5'd24] = 8'b00000111; pattern6[5'd25] = 8'b00000000;
-        pattern6[5'd26] = 8'b00001110; pattern6[5'd27] = 8'b00000000;
-        pattern6[5'd28] = 8'b00001100; pattern6[5'd29] = 8'b00000000;
-        pattern6[5'd30] = 8'b00001100; pattern6[5'd31] = 8'b00000000;
-        // 3 [20] -- does not work
-        pattern3[5'd00] = 8'b00000000; pattern3[5'd01] = 8'b00000000;
-        pattern3[5'd02] = 8'b00000001; pattern3[5'd03] = 8'b11100000;
-        pattern3[5'd04] = 8'b00000111; pattern3[5'd05] = 8'b11110000;
-        pattern3[5'd06] = 8'b00001111; pattern3[5'd07] = 8'b00110000;
-        pattern3[5'd08] = 8'b00001100; pattern3[5'd09] = 8'b00000000;
-        pattern3[5'd10] = 8'b00001100; pattern3[5'd11] = 8'b00000000;
-        pattern3[5'd12] = 8'b00001110; pattern3[5'd13] = 8'b00000000;
-        pattern3[5'd14] = 8'b00001111; pattern3[5'd15] = 8'b11110000;
-        pattern3[5'd16] = 8'b00000111; pattern3[5'd17] = 8'b11110000;
-        pattern3[5'd18] = 8'b00000001; pattern3[5'd19] = 8'b10000000;
-        pattern3[5'd20] = 8'b00000011; pattern3[5'd21] = 8'b10110000;
-        pattern3[5'd22] = 8'b00000011; pattern3[5'd23] = 8'b11110000;
-        pattern3[5'd24] = 8'b00000011; pattern3[5'd25] = 8'b11110000;
-        pattern3[5'd26] = 8'b00000011; pattern3[5'd27] = 8'b11000000;
-        pattern3[5'd28] = 8'b00000000; pattern3[5'd29] = 8'b00000000;
-        pattern3[5'd30] = 8'b00000000; pattern3[5'd31] = 8'b00000000;           
-        // 9 [30]
-        pattern9[5'd00] = 8'b00000001; pattern9[5'd01] = 8'b11000000;
-        pattern9[5'd02] = 8'b00000001; pattern9[5'd03] = 8'b11000000;
-        pattern9[5'd04] = 8'b00000001; pattern9[5'd05] = 8'b11000000;
-        pattern9[5'd06] = 8'b00000011; pattern9[5'd07] = 8'b10000000;
-        pattern9[5'd08] = 8'b00000011; pattern9[5'd09] = 8'b10000000;
-        pattern9[5'd10] = 8'b00000111; pattern9[5'd11] = 8'b00000000;
-        pattern9[5'd12] = 8'b00000111; pattern9[5'd13] = 8'b11100000;
-        pattern9[5'd14] = 8'b00001111; pattern9[5'd15] = 8'b11110000;
-        pattern9[5'd16] = 8'b00001111; pattern9[5'd17] = 8'b00111000;
-        pattern9[5'd18] = 8'b00011100; pattern9[5'd19] = 8'b01110000;
-        pattern9[5'd20] = 8'b00011111; pattern9[5'd21] = 8'b11110000;
-        pattern9[5'd22] = 8'b00001111; pattern9[5'd23] = 8'b11100000;
-        pattern9[5'd24] = 8'b00000111; pattern9[5'd25] = 8'b00000000;
-        pattern9[5'd26] = 8'b00000000; pattern9[5'd27] = 8'b00000000;
-        pattern9[5'd28] = 8'b00000000; pattern9[5'd29] = 8'b00000000;
-        pattern9[5'd30] = 8'b00000000; pattern9[5'd31] = 8'b00000000;           
-    end
-
     wire [3:0] index;
     wire [7:0] value;
     reg [3:0] latched_index;
     reg [7:0] latched_value;
-    reg [4:0] i;
 
-    wire slow_clk;
+    wire slow_clk; // = CLK;
     clock_div2 clock_div2(
         .clk_12MHz(CLK),
         .clk_6MHz(slow_clk)
     );
-    // wire slow_clk = CLK;
-
-    // always @(posedge slow_clk) begin
-    //     current_pattern_byte <= (flip) ? pattern5[i] : pattern3[i];
-    //     // current_pattern_byte <= (flip) ? pattern5[i] : pattern6[i];
-    //     // current_pattern_byte <= (flip) ? 8'hFF : pattern3[i];
-    //     if (i == 1) latched_index <= index;
-    //     if (i == 1) latched_value <= value;
-    //     i <= i + 1;
-    // end
-    // true 5 | 6 | 3 | 9
-    //----------------------
-    // -2 ~ ? | 4 |   | 
-    // +0 ~ 5 | 6 | 1 | 9
-    // +1 ~ ? | 0 |   |
-    // +2 ~ 5 | 6 | 1 | 9
-    // +3 ~ 2 | ? | 2 |
-    // +4 ~ 5 | 6 | 9 | 9
-    // +5 ~ 2 | ? | 2 |
-    // +6 ~ 5 | 1 | 9 | 6
-    // +7 ~ 2 | ? |   |
-    // +8 ~ 1 | 2 | 6 | 6 
-    // +9 ~ 1
     
     tt_um_rejunity_lgn_mnist mnist(
-        .ui_in(current_pattern_byte),
+        .ui_in(loaded_data),
         .uo_out(value),
         .uio_in({BTN2, 7'h00}),
         .uio_out(index),
@@ -218,19 +108,6 @@ module top (
     assign pmod_1b[7] = counter[0];
 
     assign pmod_1a = ~{latched_value[3:0], latched_value[7:4]};
-
-    // tt_um_rejunity_lgn_mnist mnist(
-    //     .ui_in(pmod_1a),
-    //     .uo_out(pmod_1b),
-    //     .uio_in({BTN1, 7'h00}),
-    //     .uio_out({LED_RED_N, LED_GRN_N, LED_BLU_N, LED1, LED2, LED3, LED4, LED5}),
-    //     .uio_oe(),
-    //     .ena(1'b1),
-    //     .clk(CLK),
-    //     .rst_n(BTN_N)
-    // );
-
-
 endmodule
 
 //          A
