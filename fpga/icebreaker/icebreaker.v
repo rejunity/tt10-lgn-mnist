@@ -212,9 +212,10 @@ module top (
     );
 
     seven_segment seven_segment(
-        .in(latched_index),
-        .out(pmod_1b)
+        .in(counter[0] ? latched_index : dec_digit_counter),
+        .out(pmod_1b[6:0])
     );
+    assign pmod_1b[7] = counter[0];
 
     assign pmod_1a = ~{latched_value[3:0], latched_value[7:4]};
 
