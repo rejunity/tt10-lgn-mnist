@@ -1,3 +1,6 @@
+// Parts of code adapted from
+// https://github.com/lushaylabs/tangnano9k-series-examples/blob/10ab3c194f3a9fad9ff2963740d7efdd3ef80634/screen/screen.v
+
 `default_nettype none
 
 module oled_screen_128x32
