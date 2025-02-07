@@ -19,29 +19,19 @@ module top (
     output wire[7:0] pmod_1b
 );
     localparam IMAGE_COUNT = 480; // maximum that fits in iCE40 UP5K FPGA
-    localparam CYCLES_TO_WAIT_BETWEEN_FLIPS = 12*1000*1000 / 10;
-
-    // reg [31:0] counter;
-    // reg flip;
-    // always @(posedge CLK) begin
-    //     counter <= counter + 1;
-    //     if (counter == CYCLES_TO_WAIT_BETWEEN_FLIPS) begin
-    //         flip <= ~flip;
-    //         counter <= 0;
-    //     end
-    // end
+    localparam CYCLES_TO_WAIT_BETWEEN_IMAGES = 12*1000*1000 / 10;
 
     wire on_time;
-    timer #(.CYCLES_TO_TRIGGER(CYCLES_TO_WAIT_BETWEEN_FLIPS)) timer (
+    timer #(.CYCLES_TO_TRIGGER(CYCLES_TO_WAIT_BETWEEN_IMAGES)) timer (
         .clk    (CLK),
         .slow   (BTN1 || BTN2 || BTN3),
         .trigger(on_time),
         );
 
-    reg flip; always @(posedge CLK) if (on_time) flip <= ~flip;
+    reg blinker; always @(posedge CLK) if (on_time) blinker <= ~blinker;
 
-    assign LED1 = failure && flip;
-    assign LED2 = success || flip;
+    assign LED1 = failure && blinker;
+    assign LED2 = success || blinker;
     assign {LED5, LED3, LED4} = {success, success, success};
 
 
@@ -57,7 +47,6 @@ module top (
     reg  [3:0] dec_digit_counter;
     reg  [$clog2(IMAGE_COUNT):0]     digit_counter;
     always @(posedge CLK) begin
-        // if (!failure && counter == CYCLES_TO_WAIT_BETWEEN_FLIPS) begin
         if (!failure && on_time) begin
             if (digit_counter > 0 && dec_digit_counter != latched_index)
                 failure <= 1;
@@ -85,9 +74,7 @@ module top (
 
     reg  [7:0] loaded_data;
     wire [15:0] pattern_addr = { digit_counter, pattern_counter };
-    always @(posedge slow_clk) begin
-        loaded_data <= patterns[pattern_addr];
-    end
+    always @(posedge slow_clk) loaded_data <= patterns[pattern_addr];
 
     wire [3:0] index;
     wire [7:0] value;
