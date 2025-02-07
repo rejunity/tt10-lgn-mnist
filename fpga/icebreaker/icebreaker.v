@@ -21,15 +21,24 @@ module top (
     localparam IMAGE_COUNT = 480; // maximum that fits in iCE40 UP5K FPGA
     localparam CYCLES_TO_WAIT_BETWEEN_FLIPS = 12*1000*1000 / 10;
 
-    reg [31:0] counter;
-    reg flip;
-    always @(posedge CLK) begin
-        counter <= counter + 1;
-        if (counter == CYCLES_TO_WAIT_BETWEEN_FLIPS) begin
-            flip <= ~flip;
-            counter <= 0;
-        end
-    end
+    // reg [31:0] counter;
+    // reg flip;
+    // always @(posedge CLK) begin
+    //     counter <= counter + 1;
+    //     if (counter == CYCLES_TO_WAIT_BETWEEN_FLIPS) begin
+    //         flip <= ~flip;
+    //         counter <= 0;
+    //     end
+    // end
+
+    wire on_time;
+    timer #(.CYCLES_TO_TRIGGER(CYCLES_TO_WAIT_BETWEEN_FLIPS)) timer (
+        .clk    (CLK),
+        .slow   (BTN1 || BTN2 || BTN3),
+        .trigger(on_time),
+        );
+
+    reg flip; always @(posedge CLK) if (on_time) flip <= ~flip;
 
     assign LED1 = failure && flip;
     assign LED2 = success || flip;
@@ -48,7 +57,8 @@ module top (
     reg  [3:0] dec_digit_counter;
     reg  [$clog2(IMAGE_COUNT):0]     digit_counter;
     always @(posedge CLK) begin
-        if (!failure && counter == CYCLES_TO_WAIT_BETWEEN_FLIPS) begin
+        // if (!failure && counter == CYCLES_TO_WAIT_BETWEEN_FLIPS) begin
+        if (!failure && on_time) begin
             if (digit_counter > 0 && dec_digit_counter != latched_index)
                 failure <= 1;
 
@@ -101,11 +111,12 @@ module top (
         .rst_n(BTN_N)
     );
 
+    reg tick_tock; always @(posedge CLK) tick_tock <= ~tick_tock;
     seven_segment seven_segment(
-        .in(counter[0] ? latched_index : dec_digit_counter),
+        .in(tick_tock ? latched_index : dec_digit_counter),
         .out(pmod_1b[6:0])
     );
-    assign pmod_1b[7] = counter[0];
+    assign pmod_1b[7] = tick_tock;
 
     assign pmod_1a = ~{latched_value[3:0], latched_value[7:4]};
 endmodule
@@ -137,6 +148,27 @@ module seven_segment (
         4'd9:       out = ~7'b1101111; // "9" 
         default:    out = ~7'b0111111; // "0"
         endcase
+    end
+endmodule
+
+module timer #(
+    parameter CYCLES_TO_TRIGGER = 12*1000*1000,
+    parameter SLOWDOWN_FACTOR = 8,
+) (
+    input wire clk,
+    input wire slow,
+    output wire trigger
+);
+    localparam COUNTER_BITS = $clog2(CYCLES_TO_TRIGGER);
+    localparam SLOWDOWN_BITS = $clog2(SLOWDOWN_FACTOR);
+    reg [(COUNTER_BITS+SLOWDOWN_BITS):0] counter;
+    always @(posedge clk) begin
+        trigger <= 0;
+        counter <= counter + 1;
+        if (counter[slow*SLOWDOWN_BITS +: COUNTER_BITS] >= CYCLES_TO_TRIGGER) begin
+            trigger <= 1;
+            counter <= 0;
+        end
     end
 endmodule
 
