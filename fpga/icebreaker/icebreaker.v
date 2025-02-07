@@ -137,6 +137,28 @@ module seven_segment (
     end
 endmodule
 
+module double_digit_seven_segment (
+    input  wire clk,
+    input  wire [3:0] left,
+    input  wire [3:0] right,
+    output reg  [7:0] pmod
+);
+    reg tick_tock;
+    always @(posedge clk) tick_tock <= ~tick_tock;
+    seven_segment seven_segment(
+        .in(tick_tock ? right : left),
+        .out(pmod[6:0])
+    );
+    assign pmod[7] = tick_tock;
+endmodule
+
+// MuseLab PMOD-LED v1.x is funky connected for some reason
+module muselab_eight_led_strip (
+    input  wire [7:0] in,
+    input  wire [7:0] pmod
+);
+    assign pmod = ~{in[3:0], in[7:4]};
+endmodule
 module timer #(
     parameter CYCLES_TO_TRIGGER = 12*1000*1000,
     parameter SLOWDOWN_FACTOR = 8,
