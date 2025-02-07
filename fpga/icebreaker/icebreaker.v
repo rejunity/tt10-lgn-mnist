@@ -17,22 +17,16 @@ module top (
     output wire[7:0] pmod_1a,
     output wire[7:0] pmod_1b
 );
-    localparam IMAGE_COUNT = 480; // maximum that fits in iCE40 UP5K FPGA
+    localparam IMAGE_COUNT = 480; // 480 images is maximum that fits in iCE40 UP5K FPGA
     localparam CYCLES_TO_WAIT_BETWEEN_IMAGES = 12*1000*1000 / 10;
 
     wire on_time;
-    timer #(.CYCLES_TO_TRIGGER(CYCLES_TO_WAIT_BETWEEN_IMAGES)) timer (
+    timer #(.CYCLES_TO_TRIGGER(CYCLES_TO_WAIT_BETWEEN_IMAGES),
+            .SLOWDOWN_FACTOR(8)) timer (
         .clk    (CLK),
         .slow   (BTN1 || BTN2 || BTN3),
         .trigger(on_time),
         );
-
-    reg blinker; always @(posedge CLK) if (on_time) blinker <= ~blinker;
-
-    assign LED1 = failure && blinker;
-    assign LED2 = success || blinker;
-    assign {LED5, LED3, LED4} = {success, success, success};
-
 
     localparam BYTES_PER_IMAGE = 16*2;
     reg [7:0] patterns[0:IMAGE_COUNT*BYTES_PER_IMAGE-1];
@@ -40,73 +34,90 @@ module top (
         $readmemb("../../src/test_images.mem", patterns);
     end
 
-    reg success = 0;
-    reg failure = 0;
-
-    reg  [3:0] dec_digit_counter;
-    reg  [$clog2(IMAGE_COUNT):0]     digit_counter;
+    reg [3:0] expected_digit;
+    reg [$clog2(IMAGE_COUNT):0] image_counter;
     always @(posedge CLK) begin
         if (!failure && on_time) begin
-            if (digit_counter > 0 && dec_digit_counter != latched_index)
+            if (expected_digit != latched_index) begin
                 failure <= 1;
-
-            dec_digit_counter <= dec_digit_counter + 1;
-                digit_counter <=     digit_counter + 1;
-            if (dec_digit_counter == 9)
-                dec_digit_counter <= 0;
-            if (   digit_counter == IMAGE_COUNT-1) begin
-                dec_digit_counter <= 0;
-                    digit_counter <= 0;
-                success = 1;
+            end else begin
+                expected_digit <= expected_digit + 1;
+                image_counter  <= image_counter + 1;
+                if (expected_digit == 9) // decimal digits
+                    expected_digit <= 0;
+                if (image_counter == IMAGE_COUNT-1) begin
+                    // reached the last image,
+                    // restart image counters
+                    expected_digit <= 0;
+                    image_counter <= 0;
+                    success = 1;
+                end
             end
         end
     end
 
-    reg  [4:0] pattern_counter;
-    always @(posedge slow_clk) begin
-        if (pattern_counter == 1) begin
-            latched_index <= index;
-            latched_value <= value;
-        end
-        pattern_counter <= pattern_counter + 1'b1;
-    end
+    // inference --------------------------------------------------------------
+    wire slow_clk; // = CLK;
+    clock_div2 clock_div2(
+        .clk_12MHz(CLK),
+        .clk_6MHz(slow_clk)
+    );
 
-    reg  [7:0] loaded_data;
-    wire [15:0] pattern_addr = { digit_counter, pattern_counter };
-    always @(posedge slow_clk) loaded_data <= patterns[pattern_addr];
+    reg [7:0] loaded_data;
+    reg [$clog2(BYTES_PER_IMAGE)-1:0] pattern_counter;
+    always @(posedge slow_clk) loaded_data <= patterns[{image_counter, pattern_counter}];
+    always @(posedge slow_clk) pattern_counter <= pattern_counter + 1'b1;
+    
+    localparam WE_ = 0;
+    tt_um_rejunity_lgn_mnist mnist(
+        .clk(slow_clk),
+        .ui_in  (loaded_data),
+        .uo_out (value),
+        .uio_in ({WE_, 7'h00}),
+        .uio_out(index),
+        .uio_oe (),
+        .ena    (1'b1),
+        .rst_n  (BTN_N)
+    );
 
     wire [3:0] index;
     wire [7:0] value;
     reg [3:0] latched_index;
     reg [7:0] latched_value;
 
-    wire slow_clk; // = CLK;
-    clock_div2 clock_div2(
-        .clk_12MHz(CLK),
-        .clk_6MHz(slow_clk)
-    );
-    
-    tt_um_rejunity_lgn_mnist mnist(
-        .ui_in(loaded_data),
-        .uo_out(value),
-        .uio_in({BTN2, 7'h00}),
-        .uio_out(index),
-        .uio_oe(),
-        .ena(1'b1),
-        .clk(slow_clk),
-        .rst_n(BTN_N)
+    // latch the result of the inference on the 31+2 = 1
+    localparam LATCH_INFERENCE_RESULTS_ON_CLK = 1;
+    always @(posedge slow_clk) begin
+        if (pattern_counter == LATCH_INFERENCE_RESULTS_ON_CLK) begin
+            latched_index <= index;
+            latched_value <= value;
+        end
+    end
+
+    // display ----------------------------------------------------------------
+    reg success = 0;
+    reg failure = 0;
+    reg blinker; always @(posedge CLK) if (on_time) blinker <= ~blinker;
+    assign LED1 = failure && blinker;
+    assign LED2 = success || blinker;
+    assign {LED5, LED3, LED4} = {success, success, success};
+
+    muselab_eight_led_strip value_lcd(
+        .in(latched_value),
+        .pmod(pmod_1a)
     );
 
-    reg tick_tock; always @(posedge CLK) tick_tock <= ~tick_tock;
-    seven_segment seven_segment(
-        .in(tick_tock ? latched_index : dec_digit_counter),
-        .out(pmod_1b[6:0])
+    wire [3:0] predicted_digit_with_blink_on_failure = 
+        (failure && blinker) ? 4'hF : latched_index;
+    double_digit_seven_segment category_lcd(
+        .clk(CLK),
+        .left(expected_digit),
+        .right(predicted_digit_with_blink_on_failure),
+        .pmod(pmod_1b)
     );
-    assign pmod_1b[7] = tick_tock;
-
-    assign pmod_1a = ~{latched_value[3:0], latched_value[7:4]};
 endmodule
 
+///////////////////////////////////////////////////////////////////////////////
 //          A
 //         ---
 //        |   |
@@ -132,7 +143,7 @@ module seven_segment (
         4'd7:       out = ~7'b0000111; // "7" 
         4'd8:       out = ~7'b1111111; // "8"  
         4'd9:       out = ~7'b1101111; // "9" 
-        default:    out = ~7'b0111111; // "0"
+        default:    out = ~7'b0000000; // "0"
         endcase
     end
 endmodule
@@ -159,9 +170,10 @@ module muselab_eight_led_strip (
 );
     assign pmod = ~{in[3:0], in[7:4]};
 endmodule
+
 module timer #(
     parameter CYCLES_TO_TRIGGER = 12*1000*1000,
-    parameter SLOWDOWN_FACTOR = 8,
+    parameter SLOWDOWN_FACTOR = 2,
 ) (
     input wire clk,
     input wire slow,
@@ -180,7 +192,7 @@ module timer #(
     end
 endmodule
 
-//
+///////////////////////////////////////////////////////////////////////////////
 // Clock divider(s) for sub 12MHz execution
 //
 
