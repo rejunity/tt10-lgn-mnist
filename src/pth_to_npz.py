@@ -1,3 +1,12 @@
+# /// script
+# dependencies = [
+#   "numpy",
+#   "torch",
+# ]
+# [tool.uv]
+# exclude-newer = "2024-02-20T00:00:00Z"
+# ///
+
 import torch
 import torch.nn.functional as F
 import numpy as np
@@ -25,7 +34,13 @@ def save_npz_file(file_name, npz_data):
 #--- CORE function ------------------------------------------------------------------------
 
 def pth_to_npz(checkpoint):
-    connections = checkpoint.pop("connections")
+    connections = [ [], [] ]
+    layers = [checkpoint[f"layers.{i}.c"] for i in range(len([k for k in checkpoint if k.startswith('layers.') and k.endswith('.c')]))]
+    for layer_c in layers:
+        ones_at = torch.argmax(layer_c, dim=0)
+        connections[0].append(ones_at[:,0])
+        connections[1].append(ones_at[:,1])
+
     dataset_input = checkpoint.pop("dataset_input")
     dataset_output = checkpoint.pop("dataset_output")
     layers = [checkpoint[f"layers.{i}.w"] for i in range(len([k for k in checkpoint if k.startswith('layers.') and k.endswith('.w')]))]

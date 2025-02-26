@@ -1,3 +1,12 @@
+# /// script
+# dependencies = [
+#   "numpy",
+#   "torch",
+# ]
+# [tool.uv]
+# exclude-newer = "2024-02-20T00:00:00Z"
+# ///
+
 from pth_to_npz import load_pth_file, pth_to_npz
 from npz_to_verilog import npz_to_verilog, save_verilog_file
 import sys
