@@ -17,6 +17,8 @@ CLEAR_BETWEEN_TEST_SAMPLES = False
 # CLEAR_WITH_ALTERNATING_PATTERN = False
 CLEAR_WITH_ALTERNATING_PATTERN = True
 
+SEVEN_SEGMENT = True
+
 # X = [[1, 1], [1, 0], [0, 1], [0, 0]]
 # Y =[[1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0], [0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1]]
 
@@ -144,6 +146,23 @@ def split_array(lst, chunk_size=8):
 def array_to_bin(arr):
     return ''.join(arr.astype(int).astype(str))
 
+def seven_segment_inverse(segment):
+    segment_to_digit = {
+        0b0111111: 0,
+        0b0000110: 1,
+        0b1011011: 2,
+        0b1001111: 3,
+        0b1100110: 4,
+        0b1101101: 5,
+        0b1111100: 6,
+        0b0000111: 7,
+        0b1111111: 8,
+        0b1100111: 9
+    }
+    if isinstance(segment, str):
+        segment = int(segment, 2)
+    return segment_to_digit.get(segment, None)
+
 def assert_output(dut, y):
     does_y_containt_already_summed_values = len(y) == 0 and y[0] > 0
     if not does_y_containt_already_summed_values and \
@@ -157,7 +176,10 @@ def assert_output(dut, y):
     print(categories)
 
     expected = np.argmax(categories)
-    computed = dut.uo_out.value & 15
+    if SEVEN_SEGMENT:
+        computed = seven_segment_inverse(dut.uo_out.value & 127)
+    else:
+        computed = dut.uo_out.value & 15
     dut._log.info(f"Expected category: {expected}")
     dut._log.info(f"Computed category: {computed}")
 
@@ -201,7 +223,7 @@ async def test_project(dut):
         dut._log.info("Clear input buffer")
         dut.ui_in.value = 0 if alt == 0 else 255
         dut.uio_in.value = 0
-        def category_index(): return dut.uo_out.value & 15
+        def category_index(): return dut.uo_out.value & 15 if (not SEVEN_SEGMENT) else seven_segment_inverse(dut.uo_out.value & 127)
         def category_value(): return dut.uio_out.value & 255
         if CLEAR_BETWEEN_TEST_SAMPLES:
             for i in range(256//8):

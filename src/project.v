@@ -78,14 +78,15 @@ module tt_um_rejunity_lgn_mnist (
   // assign uio_out[6:4] = 0;
   // assign uio_out[7]   = 0;
 
-  // wire [6:0] display;
-  // seven_segment seven_segment(
-  //   .in(best_category_index[3:0]),
-  //   .out(display))
+  wire [6:0] display;
+  seven_segment seven_segment(
+    .in(best_category_index[3:0]),
+    .out(display)
+  );
 
-  // assign  uo_out[6:0] = display;
-  assign  uo_out[3:0] = best_category_index[3:0];
-  assign  uo_out[7:4] = 0;
+  assign  uo_out[6:0] = display;
+  // assign  uo_out[3:0] = best_category_index[3:0];
+  assign  uo_out[7] = ~write_enable;
   assign uio_out[6:0] = best_category_value[6:0];
   assign uio_out[7]   = 0;
 
@@ -208,3 +209,37 @@ module arg_max_10 #(
         out_value = max_value_stage3;
     end
 endmodule
+
+
+//          1
+//         ---
+//        |   |
+//      6 | 7 | 2
+//         ---
+//        |   |
+//      5 | 4 | 3
+//         ---
+
+module seven_segment (
+    input  wire [3:0] in,
+    output reg  [6:0] out
+);
+    always @(*) begin
+        case(in)
+            //          .7654321
+            0:  out = 7'b0111111;
+            1:  out = 7'b0000110;
+            2:  out = 7'b1011011;
+            3:  out = 7'b1001111;
+            4:  out = 7'b1100110;
+            5:  out = 7'b1101101;
+            6:  out = 7'b1111100;
+            7:  out = 7'b0000111;
+            8:  out = 7'b1111111;
+            9:  out = 7'b1100111;
+            default:
+                out = 7'b0000000;
+        endcase
+    end
+endmodule
+
