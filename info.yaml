@@ -1,9 +1,9 @@
 # Tiny Tapeout project information
 project:
-  title:        "LGN classifier (MNIST)"      # Project title
+  title:        "LGN hand-written digit classifier (MNIST, 16x16 pixels)"
   author:       "Renaldas Zioma, Jogundas Armaitis"
   discord:      "rzioma"      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
-  description:  "Experiment with Deep Differential Logic Networks"      # One line description of what your project does
+  description:  "Experiment with Deep Differential Logic Networks"
   language:     "Verilog" # other examples include SystemVerilog, Amaranth, VHDL, etc
   clock_hz:     1000000       # Clock frequency in Hz (or 0 if not applicable)
 
@@ -34,24 +34,24 @@ pinout:
   ui[7]: "Shift-in 8-bit input packet (MSB)"
 
   # Outputs
-  uo[0]: "TO DO"
-  uo[1]: "TO DO"
-  uo[2]: "TO DO"
-  uo[3]: "TO DO"
-  uo[4]: "TO DO"
-  uo[5]: "TO DO"
-  uo[6]: "TO DO"
-  uo[7]: "TO DO"
+  uo[0]: "Digit (LSB)"
+  uo[1]: "Digit"
+  uo[2]: "Digit"
+  uo[3]: "Digit (MSB)"
+  uo[4]: ""
+  uo[5]: ""
+  uo[6]: ""
+  uo[7]: ""
 
   # Bidirectional pins
-  uio[0]: "TO DO"
-  uio[1]: "TO DO"
-  uio[2]: "TO DO"
-  uio[3]: "TO DO"
-  uio[4]: "TO DO"
-  uio[5]: "TO DO"
-  uio[6]: "TO DO"
-  uio[7]: "Pause input"
+  uio[0]: "(out) Confidence score (LSB)"
+  uio[1]: "(out) Confidence score"
+  uio[2]: "(out) Confidence score"
+  uio[3]: "(out) Confidence score"
+  uio[4]: "(out) Confidence score"
+  uio[5]: "(out) Confidence score"
+  uio[6]: "(out) Confidence score (MSB)"
+  uio[7]: "(in) /WE - Pause input"
 
 # Do not change!
 yaml_version: 6
