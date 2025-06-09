@@ -78,7 +78,7 @@ X = \
 # SavedTargetDensity: 0.3099
 # ICESTORM_LC:    8040/   5280   152%
 
-Y =        "../src/20250609-190728_binTestAcc9680_seed253544_epochs50_2x1280_b256_lr75_interconnect.npz"
+Y =        "../src/20250609-202437_binTestAcc9721_seed820279_epochs100_2x1600_b256_lr75_interconnect.npz"
 
 ############################## TEST NETS
 # Y = \

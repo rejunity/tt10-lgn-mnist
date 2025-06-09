@@ -23,7 +23,7 @@ module tt_um_rejunity_lgn_mnist (
   wire _unused = &{ena, rst_n, 1'b0};
 
   localparam INPUTS  = 256;
-  localparam OUTPUTS = 1280;
+  localparam OUTPUTS = 1600;
   localparam CATEGORIES = 10;
   // localparam BITS_PER_CATEGORY = 255;
   localparam BITS_PER_CATEGORY = 127;
@@ -48,7 +48,9 @@ module tt_um_rejunity_lgn_mnist (
   generate
     for (i = 0; i < CATEGORIES; i = i+1) begin : calc_categories
       // sum_bits #(.N(BITS_PER_CATEGORY)) sum_bits(
-      //   .y(y_categories[i*BITS_PER_CATEGORY +: BITS_PER_CATEGORY]),
+      //   .y(y_categories[i*BITS_PER_CATEGORY +: BITS_PER_CATEGORY]),      
+      //   .sum(sum_categories[i*BITS_PER_CATEGORY_SUM +: BITS_PER_CATEGORY_SUM])
+      // );
       
       // sum_255_bits sum_bits(
       //   .y(y_categories[i*BITS_PER_CATEGORY +: 255]),
