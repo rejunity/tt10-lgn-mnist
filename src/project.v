@@ -17,7 +17,7 @@ module tt_um_rejunity_lgn_mnist (
 );
 
   assign uio_oe  = 8'b0111_1111; // BIDIR in output mode, except "write_enable" the highest bit 
-  wire write_enable = 1; // ~uio_in[7];
+  wire write_enable = ~uio_in[7];
 
   // List all unused inputs to prevent warnings
   wire _unused = &{ena, rst_n, 1'b0};
