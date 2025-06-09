@@ -23,7 +23,7 @@ module tt_um_rejunity_lgn_mnist (
   wire _unused = &{ena, rst_n, 1'b0};
 
   localparam INPUTS  = 256;
-  localparam OUTPUTS = 1600;
+  localparam OUTPUTS = 2560;
   localparam CATEGORIES = 10;
   // localparam BITS_PER_CATEGORY = 255;
   localparam BITS_PER_CATEGORY = 127;
@@ -84,8 +84,8 @@ module tt_um_rejunity_lgn_mnist (
     .out(display)
   );
 
+  // assign  uo_out[3:0] = best_category_index[3:0]; assign  uo_out[6:4] = 0;
   assign  uo_out[6:0] = display;
-  // assign  uo_out[3:0] = best_category_index[3:0];
   assign  uo_out[7] = ~write_enable;
   assign uio_out[6:0] = best_category_value[6:0];
   assign uio_out[7]   = 0;
