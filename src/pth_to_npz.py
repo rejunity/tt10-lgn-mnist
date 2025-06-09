@@ -25,15 +25,62 @@ def save_npz_file(file_name, npz_data):
 #--- CORE function ------------------------------------------------------------------------
 
 def pth_to_npz(checkpoint):
-    connections = checkpoint.pop("connections")
-    dataset_input = checkpoint.pop("dataset_input")
-    dataset_output = checkpoint.pop("dataset_output")
-    layers = [checkpoint[f"layers.{i}.w"] for i in range(len([k for k in checkpoint if k.startswith('layers.') and k.endswith('.w')]))]
+    print(checkpoint.keys())
+
+    if "connections" in checkpoint:
+        connections = checkpoint.pop("connections")
+        layers = [checkpoint[f"layers.{i}.w"] for i in range(len([k for k in checkpoint if k.startswith('layers.') and k.endswith('.w')]))]
+    else:
+        c = {}
+        w = {}
+        indices = {}
+        for key in checkpoint.keys():
+            parts = key.split('.')
+            if len(parts) != 3 or parts[0] != 'layers':
+                continue  # Skip tensors that don't contain layer parameters
+            layer_id, type = int(parts[1]), parts[2]
+            # print(layer_id)
+            
+            value = checkpoint[key]
+            if type == 'c':
+                # print(value.shape, torch.argmax(value, dim=0).shape, torch.argmax(value, dim=1).shape)
+                c[layer_id] = torch.argmax(value, dim=0)
+            elif type == 'w':
+                w[layer_id] = value
+            elif type == 'indices':
+                indices[layer_id] = value
+
+        # print(len(c), len(w), len(indices))
+
+        layers = [v for key, v in sorted(w.items(), key=lambda item: item[0])]
+        connections = {**c, **indices}
+        connections = [v for key, v in sorted(connections.items(), key=lambda item: item[0])]
+        assert len(layers) == len(connections), f"{len(layers)} {len(connections)}"
+
+        conn_a = []
+        conn_b = []
+        for c in connections:
+            x = c.view(-1, 2)   # [number_of_gates, 2]
+            A = x[:,0]          # [number_of_gates]
+            B = x[:,1]          # [number_of_gates]
+            # A, B = torch.chunk(c, 2, dim=0)
+            conn_a.append(A)
+            conn_b.append(B)
+        connections = [conn_a, conn_b]
 
     assert len(connections) == 2
     if "net_architecture" in checkpoint:
         print("Architecture: ", checkpoint["net_architecture"])
     print("Number of layers: ", len(layers))
+
+    dataset_input = [torch.tensor((1,1))] # default
+    if "dataset_input" in checkpoint:
+        dataset_input = checkpoint.pop("dataset_input")
+
+    dataset_output = [torch.tensor((1,1))] # default
+    if "dataset_output" in checkpoint:
+        dataset_output = checkpoint.pop("dataset_output")
+
 
     gate_types = [torch.argmax(layer, dim=0) for layer in layers]
 
