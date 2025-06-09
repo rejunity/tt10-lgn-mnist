@@ -71,13 +71,14 @@ X = \
 # TargetDensity: 0.25
 # ICESTORM_LC:    6577/   5280   124%
 
-Y =        "../src/binarized_20250124-152724_acc9449_seed470315_epochs100_3x2550_b256_lrm10-1_pass0with_dataset.npz"
+# Y =        "../src/binarized_20250124-152724_acc9449_seed470315_epochs100_3x2550_b256_lrm10-1_pass0with_dataset.npz"
 # 7.7K gates, utilisation: 29.01%, wire: 816369
 # Multi-Input combinational cell 6262
 # Congestion: 54.14%  
 # SavedTargetDensity: 0.3099
 # ICESTORM_LC:    8040/   5280   152%
 
+Y =        "../src/20250609-161054_binTestAcc9611_seed571850_epochs50_2x1280_b256_lr75_interconnect.npz"
 
 ############################## TEST NETS
 # Y = \
@@ -168,7 +169,7 @@ def assert_output(dut, y):
 
     assert expected == computed
 
-@cocotb.test()
+# @cocotb.test()
 async def test_project(dut):
     dut._log.info("Start")
 

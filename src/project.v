@@ -23,10 +23,11 @@ module tt_um_rejunity_lgn_mnist (
   wire _unused = &{ena, rst_n, 1'b0};
 
   localparam INPUTS  = 256;
-  localparam OUTPUTS = 4000;
+  localparam OUTPUTS = 1280;
   localparam CATEGORIES = 10;
   // localparam BITS_PER_CATEGORY = 255;
   localparam BITS_PER_CATEGORY = 127;
+  // localparam OUTPUTS = BITS_PER_CATEGORY * CATEGORIES;
   localparam BITS_PER_CATEGORY_SUM = $clog2(BITS_PER_CATEGORY);
   always @(posedge clk) begin : set_inputs
     if (write_enable)
@@ -118,7 +119,7 @@ endmodule
 
 module sum_127_bits (
     input wire [127-1:0] y,
-    output wire  [8-1:0] sum
+    output wire  [7-1:0] sum
 );
     wire unused_msb;
     PopCount128 popcount128(.data({1'b0, y}), .count({unused_msb, sum}));

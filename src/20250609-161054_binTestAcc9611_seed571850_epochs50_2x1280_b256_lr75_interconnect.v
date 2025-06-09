@@ -1,7 +1,7 @@
 // Generated from: 20250609-161054_binTestAcc9611_seed571850_epochs50_2x1280_b256_lr75_interconnect.pth
 
 module net (
-    input  wire [251:0] in,
+    input  wire [255:0] in,
     output wire [1279:0] out,
     output wire [1269:0] categories
 );
