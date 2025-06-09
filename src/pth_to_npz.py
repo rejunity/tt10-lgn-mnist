@@ -94,7 +94,6 @@ def pth_to_npz(checkpoint):
     gate_types = pad_tensor_array(gate_types, max_size).cpu().numpy()
     connections[0] = pad_tensor_array(connections[0], max_size).cpu().numpy()
     connections[1] = pad_tensor_array(connections[1], max_size).cpu().numpy()
-    dataset_output = pad_tensor_array(dataset_output, max_size).cpu().numpy()
 
     padded_size = gate_types.size + connections[0].size + connections[1].size 
     if padded_size - original_size > 0:
