@@ -71,10 +71,22 @@ module tt_um_rejunity_lgn_mnist (
     .out_value(best_category_value)
   );
 
-  assign  uo_out[7:0] = best_category_value[7:0];
-  assign uio_out[3:0] = best_category_index[3:0];
-  assign uio_out[6:4] = 0;
+  // assign  uo_out[7:0] = best_category_value[7:0];
+  // assign uio_out[3:0] = best_category_index[3:0];
+  // assign uio_out[6:4] = 0;
+  // assign uio_out[7]   = 0;
+
+  // wire [6:0] display;
+  // seven_segment seven_segment(
+  //   .in(best_category_index[3:0]),
+  //   .out(display))
+
+  // assign  uo_out[6:0] = display;
+  assign  uo_out[3:0] = best_category_index[3:0];
+  assign  uo_out[7:4] = 0;
+  assign uio_out[6:0] = best_category_value[6:0];
   assign uio_out[7]   = 0;
+
 
 endmodule
 

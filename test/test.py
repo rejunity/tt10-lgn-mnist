@@ -78,7 +78,7 @@ X = \
 # SavedTargetDensity: 0.3099
 # ICESTORM_LC:    8040/   5280   152%
 
-Y =        "../src/20250609-174318_binTestAcc9615_seed491271_epochs50_2x1280_b256_lr75_interconnect.npz"
+Y =        "../src/20250609-190728_binTestAcc9680_seed253544_epochs50_2x1280_b256_lr75_interconnect.npz"
 
 ############################## TEST NETS
 # Y = \
@@ -157,14 +157,14 @@ def assert_output(dut, y):
     print(categories)
 
     expected = np.argmax(categories)
-    computed = dut.uio_out.value & 15
+    computed = dut.uo_out.value & 15
     dut._log.info(f"Expected category: {expected}")
     dut._log.info(f"Computed category: {computed}")
 
     assert expected == computed
 
     expected = int(categories[expected])
-    computed = dut.uo_out.value & 255
+    computed = dut.uio_out.value & 255
     dut._log.info(f"Expected value: {expected}")
     dut._log.info(f"Computed value: {computed}")
 
