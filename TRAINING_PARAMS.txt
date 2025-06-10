@@ -1,0 +1,156 @@
+# /// script
+# dependencies = [
+#   "python-dotenv",
+#   "numpy",
+#   "wandb",
+#   "torch",
+#   "torchvision",
+#   "IPython",
+#   "python-telegram-bot",
+#   "asyncio",
+# ]
+# [tool.uv]
+# exclude-newer = "2024-02-20T00:00:00Z"
+# ///
+# pip install wandb python-dotenv python-telegram-bot asyncio
+
+(.venv-lgn) rej@Renaldass-MacBook-Pro TrainableLogicGateNetworks.my.git % git branch
+  auto_scale_logits_97_5
+  cache_data_transform
+  conn_gain96
+  dropout
+  dropout_v2
+  experimental
+  faster_data_upload
+* like_difflogic
+  like_difflogic_v2
+  logging
+  main
+  power_law_fixed_conn97
+  resnet95
+  restricted_wiring_0
+  topk98
+  topk_annealing
+
+(.venv-lgn) rej@Renaldass-MacBook-Pro TrainableLogicGateNetworks.my.git % git log -n 3  
+commit 2d01af55ed1af3e8c5b793bc3f9af10041de85ca (HEAD -> like_difflogic, upstream/like_difflogic)
+Author: rej <rzioma@acm.org>
+Date:   Wed May 14 23:11:52 2025 +0200
+
+    LOG: no_grad() in get_unique_fraction()
+
+commit 1932ff6fd5f5601de74bdf9a21b82957049d232f
+Author: rej <rzioma@acm.org>
+Date:   Wed May 14 23:10:15 2025 +0200
+
+    CORE: Dirac does improve TopK performance, fallback to Gaussian initialization instead
+
+commit a25a733baf2e5597b285513998257d991615f7fd (origin/like_difflogic)
+Author: rej <rzioma@acm.org>
+Date:   Wed May 14 16:56:16 2025 +0200
+
+    Removed duplicated line
+
+(.venv-lgn) rej@Renaldass-MacBook-Pro TrainableLogicGateNetworks.my.git % C_INIT="NORMAL" TAU_LR=.03 SCALE_TARGET=1 SCALE_LOGITS="ADAVAR" MANUAL_GAIN=1 LEARNING_RATE=0.05 GATE_ARCHITECTURE="[2560, 1270]" INTERCONNECT_ARCHITECTURE="[[],[-1]]" IMG_WIDTH=16 IMG_CROP=22 EPOCHS=30 VALIDATE_EVERY=2320 uv run mnist.py 
+22:58:40 --------------------------------------------------------------------------------
+22:58:40 LOG_NAME=MNIST_1018940
+22:58:40 TIMEZONE=UTC
+22:58:40 WANDB_PROJECT=mnist_project
+22:58:40 BINARIZE_IMAGE_TRESHOLD=0.75
+22:58:40 IMG_WIDTH=16
+22:58:40 INPUT_SIZE=256
+22:58:40 IMG_CROP=22
+22:58:40 DATA_SPLIT_SEED=42
+22:58:40 TRAIN_FRACTION=0.99
+22:58:40 NUMBER_OF_CATEGORIES=10
+22:58:40 ONLY_USE_DATA_SUBSET=False
+22:58:40 SEED=1018940
+22:58:40 GATE_ARCHITECTURE=[2560, 1270]
+22:58:40 INTERCONNECT_ARCHITECTURE=[[], [-1]]
+22:58:40 BATCH_SIZE=256
+22:58:40 EPOCHS=30
+22:58:40 EPOCH_STEPS=232
+22:58:40 TRAINING_STEPS=6960
+22:58:40 PRINTOUT_EVERY=232
+22:58:40 VALIDATE_EVERY=2320
+22:58:40 LEARNING_RATE=0.05
+22:58:40 C_INIT=NORMAL
+22:58:40 C_INIT_PARAM=-1.0
+22:58:40 G_INIT=NORMAL
+22:58:40 C_SPARSITY=1.0
+22:58:40 G_SPARSITY=1.0
+22:58:40 PASS_INPUT_TO_ALL_LAYERS=False
+22:58:40 PASS_RESIDUAL=False
+22:58:40 NO_SOFTMAX=True
+22:58:40 MANUAL_GAIN=1.0
+22:58:40 SCALE_LOGITS=ADAVAR
+22:58:40 SCALE_TARGET=1.0
+22:58:40 TAU_LR=0.03
+22:58:40 DROPOUT=0.0
+22:58:40 SUPPRESS_PASSTHROUGH=False
+22:58:40 SUPPRESS_CONST=False
+22:58:40 TENSION_REGULARIZATION=-1.0
+22:58:40 PROFILE=False
+22:58:40 FORCE_CPU=False
+22:58:40 COMPILE_MODEL=False
+22:58:40 --------------------------------------------------------------------------------
+22:58:40 PREPARE MODEL on device=mps
+22:58:40 model=Model(
+  (layers): ModuleList(
+    (0): SparseInterconnect(256 -> 2560x2)
+    (1): LearnableGate16Array(2560)
+    (2): FixedPowerLawInterconnect(2560 -> 1270x2, α=1, mean=647 median=648)
+    (3): LearnableGate16Array(1270)
+  )
+)
+22:58:40 READ DATA
+Loaded cached MNIST train from ./data/cached_mnist_train_3fbb4009fc.pt
+Loaded cached MNIST test from ./data/cached_mnist_test_3fbb4009fc.pt
+22:58:40 UPLOAD DATA
+22:58:41 INIT VAL loss= 2.307 acc=  9.33%                 - Pass 25.4%, 25.0% | Connectivity 100.0%, 99.3%
+22:58:41 EPOCH_STEPS=232, will train for 30 EPOCHS
+22:58:45 Iteration        232 - Loss  0.250 - RegLoss  0% - Pass (%) 28 42 | Conn (%) 94 99 | e-∇x10 -52 -47 -43 | Logits 34..102 μ60±10.4/2.7 = ±3.9 ‖1151‖
+22:58:49 Iteration        464 - Loss  0.166 - RegLoss  0% - Pass (%) 25 40 | Conn (%) 94 99 | e-∇x10 -53 -49 -46 | Logits 35..100 μ61±10.1/2.5 = ±4.0 ‖1231‖
+22:58:53 Iteration        696 - Loss  0.102 - RegLoss  0% - Pass (%) 23 40 | Conn (%) 93 99 | e-∇x10 -53 -51 -47 | Logits 32..100 μ61±10.5/2.7 = ±3.9 ‖1176‖
+22:58:57 Iteration        928 - Loss  0.086 - RegLoss  0% - Pass (%) 22 39 | Conn (%) 94 99 | e-∇x10 -54 -52 -49 | Logits 33..102 μ61±11.0/2.8 = ±3.9 ‖1115‖
+22:59:01 Iteration       1160 - Loss  0.069 - RegLoss  0% - Pass (%) 21 39 | Conn (%) 94 99 | e-∇x10 -55 -52 -50 | Logits 31..107 μ60±11.7/2.9 = ±4.0 ‖1065‖
+22:59:05 Iteration       1392 - Loss  0.079 - RegLoss  0% - Pass (%) 20 39 | Conn (%) 95 99 | e-∇x10 -54 -52 -49 | Logits 28..103 μ60±12.0/3.1 = ±3.9 ‖1018‖
+22:59:09 Iteration       1624 - Loss  0.057 - RegLoss  0% - Pass (%) 20 38 | Conn (%) 95 99 | e-∇x10 -55 -55 -51 | Logits 28..106 μ60±12.6/3.1 = ±4.0 ‖989‖
+22:59:14 Iteration       1856 - Loss  0.076 - RegLoss  0% - Pass (%) 19 37 | Conn (%) 95 99 | e-∇x10 -55 -53 -50 | Logits 25..104 μ60±12.8/3.2 = ±4.0 ‖967‖
+22:59:18 Iteration       2088 - Loss  0.055 - RegLoss  0% - Pass (%) 18 36 | Conn (%) 95 99 | e-∇x10 -56 -56 -52 | Logits 24..107 μ59±13.2/3.3 = ±4.0 ‖944‖
+22:59:22 Iteration       2320 - Loss  0.040 - RegLoss  0% - Pass (%) 18 35 | Conn (%) 95 99 | e-∇x10 -56 -56 -53 | Logits 28..107 μ59±13.4/3.3 = ±4.1 ‖926‖
+22:59:25 MNIST_1018940 EPOCH=10/30     TRN loss=0.052 acc=98.98%
+22:59:28 MNIST_1018940 EPOCH=10/30 BIN TRN            acc=98.46%, train_acc_diff=0.51%
+22:59:29 MNIST_1018940 EPOCH=10/30     TST            acc=97.38%, test_acc_diff= 1.60%, loss=0.087
+22:59:33 Iteration       2552 - Loss  0.039 - RegLoss  0% - Pass (%) 18 35 | Conn (%) 95 99 | e-∇x10 -57 -58 -55 | Logits 27..105 μ59±13.4/3.3 = ±4.0 ‖918‖
+22:59:37 Iteration       2784 - Loss  0.045 - RegLoss  0% - Pass (%) 17 34 | Conn (%) 95 99 | e-∇x10 -56 -55 -55 | Logits 21..108 μ59±13.7/3.4 = ±4.0 ‖903‖
+22:59:41 Iteration       3016 - Loss  0.068 - RegLoss  0% - Pass (%) 17 33 | Conn (%) 95 99 | e-∇x10 -55 -55 -53 | Logits 23..109 μ59±13.6/3.4 = ±4.0 ‖896‖
+22:59:45 Iteration       3248 - Loss  0.049 - RegLoss  0% - Pass (%) 16 32 | Conn (%) 95 99 | e-∇x10 -56 -57 -54 | Logits 23..107 μ58±13.4/3.4 = ±3.9 ‖885‖
+22:59:49 Iteration       3480 - Loss  0.040 - RegLoss  0% - Pass (%) 16 32 | Conn (%) 95 99 | e-∇x10 -57 -57 -55 | Logits 22..110 μ58±13.9/3.4 = ±4.0 ‖875‖
+22:59:53 Iteration       3712 - Loss  0.042 - RegLoss  0% - Pass (%) 16 31 | Conn (%) 95 99 | e-∇x10 -56 -56 -54 | Logits 24..106 μ58±13.9/3.5 = ±4.0 ‖877‖
+22:59:57 Iteration       3944 - Loss  0.080 - RegLoss  0% - Pass (%) 16 31 | Conn (%) 95 99 | e-∇x10 -56 -57 -56 | Logits 24..108 μ58±13.8/3.5 = ±4.0 ‖865‖
+23:00:02 Iteration       4176 - Loss  0.059 - RegLoss  0% - Pass (%) 16 30 | Conn (%) 95 99 | e-∇x10 -56 -57 -55 | Logits 22..105 μ58±13.8/3.5 = ±4.0 ‖868‖
+23:00:06 Iteration       4408 - Loss  0.038 - RegLoss  0% - Pass (%) 15 30 | Conn (%) 95 99 | e-∇x10 -57 -58 -56 | Logits 22..106 μ58±13.9/3.5 = ±4.0 ‖864‖
+23:00:10 Iteration       4640 - Loss  0.054 - RegLoss  0% - Pass (%) 15 30 | Conn (%) 95 99 | e-∇x10 -56 -57 -56 | Logits 24..110 μ58±13.9/3.5 = ±4.0 ‖861‖
+23:00:13 MNIST_1018940 EPOCH=20/30     TRN loss=0.044 acc=99.20%
+23:00:16 MNIST_1018940 EPOCH=20/30 BIN TRN            acc=98.88%, train_acc_diff=0.31%
+23:00:17 MNIST_1018940 EPOCH=20/30     TST            acc=97.60%, test_acc_diff= 1.60%, loss=0.084
+23:00:21 Iteration       4872 - Loss  0.040 - RegLoss  0% - Pass (%) 15 29 | Conn (%) 95 99 | e-∇x10 -57 -56 -55 | Logits 22..108 μ57±14.2/3.5 = ±4.1 ‖856‖
+23:00:25 Iteration       5104 - Loss  0.052 - RegLoss  0% - Pass (%) 15 29 | Conn (%) 95 99 | e-∇x10 -56 -56 -54 | Logits 24..114 μ58±14.0/3.5 = ±4.0 ‖857‖
+23:00:29 Iteration       5336 - Loss  0.027 - RegLoss  0% - Pass (%) 15 29 | Conn (%) 95 99 | e-∇x10 -58 -62 -58 | Logits 26..110 μ57±14.0/3.5 = ±4.0 ‖848‖
+23:00:34 Iteration       5568 - Loss  0.062 - RegLoss  0% - Pass (%) 15 28 | Conn (%) 95 99 | e-∇x10 -55 -56 -55 | Logits 20..112 μ57±14.0/3.5 = ±4.0 ‖840‖
+23:00:38 Iteration       5800 - Loss  0.056 - RegLoss  0% - Pass (%) 15 28 | Conn (%) 95 99 | e-∇x10 -55 -56 -54 | Logits 19..108 μ57±14.3/3.5 = ±4.0 ‖845‖
+23:00:42 Iteration       6032 - Loss  0.053 - RegLoss  0% - Pass (%) 14 28 | Conn (%) 95 99 | e-∇x10 -56 -57 -57 | Logits 25..109 μ57±14.2/3.5 = ±4.0 ‖845‖
+23:00:46 Iteration       6264 - Loss  0.045 - RegLoss  0% - Pass (%) 14 27 | Conn (%) 95 99 | e-∇x10 -55 -58 -57 | Logits 23..109 μ57±14.1/3.5 = ±4.0 ‖846‖
+23:00:51 Iteration       6496 - Loss  0.044 - RegLoss  0% - Pass (%) 14 27 | Conn (%) 95 99 | e-∇x10 -57 -58 -57 | Logits 26..109 μ57±14.1/3.5 = ±4.0 ‖842‖
+23:00:55 Iteration       6728 - Loss  0.026 - RegLoss  0% - Pass (%) 14 27 | Conn (%) 94 99 | e-∇x10 -59 -60 -58 | Logits 24..105 μ57±14.1/3.5 = ±4.0 ‖842‖
+23:00:59 Iteration       6960 - Loss  0.040 - RegLoss  0% - Pass (%) 14 26 | Conn (%) 94 99 | e-∇x10 -57 -59 -59 | Logits 20..108 μ57±14.4/3.5 = ±4.1 ‖842‖
+23:01:02 MNIST_1018940 EPOCH=30/30     TRN loss=0.042 acc=99.30%
+23:01:06 MNIST_1018940 EPOCH=30/30 BIN TRN            acc=99.00%, train_acc_diff=0.30%
+23:01:06 MNIST_1018940 EPOCH=30/30     TST            acc=97.60%, test_acc_diff= 1.70%, loss=0.084
+23:01:06 Training took 145.66 seconds, per iteration: 20.93 milliseconds
+23:01:07     TEST loss=0.084 acc=97.60%
+23:01:07 BIN TEST loss=0.279 acc=97.46%
+torch.Size([600, 1270])
+23:01:08 Saved to 20250609-230107_binTestAcc9746_seed1018940_epochs30_2x2560_b256_lr50_interconnect.pth
+
