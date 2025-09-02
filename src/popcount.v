@@ -5,11 +5,12 @@
 
 `default_nettype none
 
-`ifdef SIM
-`elsif FPGA
-`else
-`define USE_HA_FA_CELLS
-`endif
+// %TODO: Add detection for SKY130 vs IHP130 process
+// `ifdef SIM
+// `elsif FPGA
+// `else
+// `define USE_HA_FA_CELLS
+// `endif
 
 module PopCount256 (
   input [255:0] data,
