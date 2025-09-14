@@ -25,8 +25,8 @@ module tt_um_rejunity_lgn_mnist (
   localparam INPUTS  = 256;
   localparam OUTPUTS = 2560;
   localparam CATEGORIES = 10;
-  // localparam BITS_PER_CATEGORY = 255;
-  localparam BITS_PER_CATEGORY = 127;
+  localparam BITS_PER_CATEGORY = 255;
+  // localparam BITS_PER_CATEGORY = 127;
   // localparam OUTPUTS = BITS_PER_CATEGORY * CATEGORIES;
   localparam BITS_PER_CATEGORY_SUM = $clog2(BITS_PER_CATEGORY);
   always @(posedge clk) begin : set_inputs
@@ -52,15 +52,15 @@ module tt_um_rejunity_lgn_mnist (
       //   .sum(sum_categories[i*BITS_PER_CATEGORY_SUM +: BITS_PER_CATEGORY_SUM])
       // );
       
-      // sum_255_bits sum_bits(
-      //   .y(y_categories[i*BITS_PER_CATEGORY +: 255]),
-      //   .sum(sum_categories[i*BITS_PER_CATEGORY_SUM +: BITS_PER_CATEGORY_SUM])
-      // );
-
-      sum_127_bits sum_bits(
+      sum_255_bits sum_bits(
         .y(y_categories[i*BITS_PER_CATEGORY +: BITS_PER_CATEGORY]),
         .sum(sum_categories[i*BITS_PER_CATEGORY_SUM +: BITS_PER_CATEGORY_SUM])
       );
+
+      // sum_127_bits sum_bits(
+      //   .y(y_categories[i*BITS_PER_CATEGORY +: BITS_PER_CATEGORY]),
+      //   .sum(sum_categories[i*BITS_PER_CATEGORY_SUM +: BITS_PER_CATEGORY_SUM])
+      // );
 
     end
   endgenerate
@@ -87,7 +87,7 @@ module tt_um_rejunity_lgn_mnist (
   // assign  uo_out[3:0] = best_category_index[3:0]; assign  uo_out[6:4] = 0;
   assign  uo_out[6:0] = display;
   assign  uo_out[7] = ~write_enable;
-  assign uio_out[6:0] = best_category_value[6:0];
+  assign uio_out[6:0] = best_category_value[1 +: 7];
   assign uio_out[7]   = 0;
 
 
