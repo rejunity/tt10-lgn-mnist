@@ -25,6 +25,8 @@ ASSUME_CIRCULAR_LAYOUT_FOR_CONNECTION_LENGTH = True
 # FORCE_RANDOM_GATES = [range(1, 14)]
 # FORCE_TO_POWER_LAW = [.55, 0.1]
 
+NEED_TO_PACK_STRIDED_OUTPUTS_INTO_CATEGORIES = False
+
 NUMBER_OF_CATEGORIES = 10
 # OUTPUT_BITS_PER_CATEGORY = 127
 OUTPUT_BITS_PER_CATEGORY = 255
@@ -118,17 +120,20 @@ def generate_verilog(global_inputs, gates, conn_a, conn_b, number_of_categories=
 
     if number_of_categories > 0:
         body += f"    // Arrange outputs in categories ================================================\n"
-        out_wires_per_category = global_outputs // number_of_categories
-        for i in range(number_of_categories):
-            out_lo = i * out_wires_per_category
-            cat_lo = i * output_bits_per_category
-            out_hi = out_lo + min(out_wires_per_category, output_bits_per_category) - 1
-            cat_hi = cat_lo + min(out_wires_per_category, output_bits_per_category) - 1
-            body += f"    assign categories[{cat_hi}:{cat_lo}] = out[{out_hi}:{out_lo}];\n"
+        if NEED_TO_PACK_STRIDED_OUTPUTS_INTO_CATEGORIES:
+            out_wires_per_category = global_outputs // number_of_categories
+            for i in range(number_of_categories):
+                out_lo = i * out_wires_per_category
+                cat_lo = i * output_bits_per_category
+                out_hi = out_lo + min(out_wires_per_category, output_bits_per_category) - 1
+                cat_hi = cat_lo + min(out_wires_per_category, output_bits_per_category) - 1
+                body += f"    assign categories[{cat_hi}:{cat_lo}] = out[{out_hi}:{out_lo}];\n"
 
-            if (output_bits_per_category > out_wires_per_category):
-                cat_full = cat_lo + output_bits_per_category - 1
-                body += f"    assign categories[{cat_full}:{cat_hi + 1}] = 0;\n"
+                if (output_bits_per_category > out_wires_per_category):
+                    cat_full = cat_lo + output_bits_per_category - 1
+                    body += f"    assign categories[{cat_full}:{cat_hi + 1}] = 0;\n"
+        else:
+            body += f"    assign categories[{output_bits_per_category*number_of_categories-1}:0] = out[{output_bits_per_category*number_of_categories-1}:0];\n"
 
     verilog = ""
     if RELAY_LONG_CONNECTIONS > 0:
