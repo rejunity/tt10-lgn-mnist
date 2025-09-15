@@ -194,7 +194,7 @@ def assert_output(dut, y):
     dut._log.info(f"Expected value: {expected}")
     dut._log.info(f"Computed value: {computed}")
 
-    assert (expected // 4) == (computed // 4) # approximately equal
+    assert expected == computed
 
 @cocotb.test()
 async def test_project(dut):
