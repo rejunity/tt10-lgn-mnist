@@ -181,7 +181,7 @@ def assert_output(dut, y):
     categories = np.sum(y.reshape(10, -1), -1)
     print(categories)
 
-    expected = np.argmax(categories)
+    expected = len(categories) - 1 - np.argmax(categories[::-1])
     if SEVEN_SEGMENT:
         computed = seven_segment_inverse(dut.uo_out.value & 127)
     else:
