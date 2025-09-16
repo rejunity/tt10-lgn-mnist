@@ -8,7 +8,7 @@
 `ifdef SIM
 `elsif FPGA
 `else
-// `define USE_HA_FA_CELLS
+`define USE_HA_FA_CELLS
 `endif
 
 module PopCount256 (
