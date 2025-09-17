@@ -23,7 +23,7 @@ module tt_um_rejunity_lgn_mnist (
   wire _unused = &{ena, rst_n, 1'b0};
 
   localparam INPUTS  = 256;
-  localparam OUTPUTS = 2560;
+  localparam OUTPUTS = 2550;
   localparam CATEGORIES = 10;
   localparam BITS_PER_CATEGORY = 255;
   // localparam BITS_PER_CATEGORY = 127;
