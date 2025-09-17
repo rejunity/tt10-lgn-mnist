@@ -20422,6 +20422,6 @@ module net (
     assign out[2548] = layer_6[2547]; 
     assign out[2549] = layer_6[2549] & layer_6[0]; 
     // Arrange outputs in categories ================================================
-    assign categories[2549:0] = layer_4[2549:0];
+    assign categories[2549:0] = layer_3[2549:0];
 
 endmodule
