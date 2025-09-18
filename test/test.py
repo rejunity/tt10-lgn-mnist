@@ -86,7 +86,9 @@ X = \
 # Y =   "../src/20250915-065800_binTestAcc9758_seed635334_epochs100_2x3200_b256_lr30_interconnect.npz"
 # Y =   "../src/20250915-070516_binTestAcc9760_seed230646_epochs100_2x4000_b256_lr30_interconnect.npz"
 # Y =   "../src/20250916-211123_binTestAcc9600_seed742253_epochs100_8x2550_b256_lr30_interconnect.npz"
-Y =     "../src/20250917-070356_binTestAcc9698_seed302376_epochs70_8x2550_b256_lr30_interconnect.npz"
+# Y =   "../src/20250917-070356_binTestAcc9698_seed302376_epochs70_8x2550_b256_lr30_interconnect.npz"
+Y =   "../src/20250918-061801_binTestAcc9698_seed492503_epochs70_8x2550_b256_lr30_interconnect.npz"
+
 
 ############################## TEST NETS
 # Y = \
