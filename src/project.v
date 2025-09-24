@@ -50,17 +50,16 @@ module tt_um_rejunity_lgn_mnist (
       //   .y(y_categories[i*BITS_PER_CATEGORY +: BITS_PER_CATEGORY]),      
       //   .sum(sum_categories[i*BITS_PER_CATEGORY_SUM +: BITS_PER_CATEGORY_SUM])
       // );
-      
-      sum_255_bits sum_bits(
-        .y(y_categories[i*BITS_PER_CATEGORY +: BITS_PER_CATEGORY]),
-        .sum(sum_categories[i*BITS_PER_CATEGORY_SUM +: BITS_PER_CATEGORY_SUM])
-      );
-
-      // sum_127_bits sum_bits(
-      //   .y(y_categories[i*BITS_PER_CATEGORY +: BITS_PER_CATEGORY]),
-      //   .sum(sum_categories[i*BITS_PER_CATEGORY_SUM +: BITS_PER_CATEGORY_SUM])
-      // );
-
+      if (BITS_PER_CATEGORY <= 127)
+        sum_127_bits sum_bits(
+          .y(y_categories[i*BITS_PER_CATEGORY +: BITS_PER_CATEGORY]),
+          .sum(sum_categories[i*BITS_PER_CATEGORY_SUM +: BITS_PER_CATEGORY_SUM])
+        );
+      else
+        sum_255_bits sum_bits(
+          .y(y_categories[i*BITS_PER_CATEGORY +: BITS_PER_CATEGORY]),
+          .sum(sum_categories[i*BITS_PER_CATEGORY_SUM +: BITS_PER_CATEGORY_SUM])
+        );
     end
   endgenerate
 
