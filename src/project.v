@@ -23,11 +23,10 @@ module tt_um_rejunity_lgn_mnist (
   wire _unused = &{ena, rst_n, 1'b0};
 
   localparam INPUTS  = 256;
-  localparam OUTPUTS = 2550;
+  localparam BITS_PER_CATEGORY = 127;
+  // localparam BITS_PER_CATEGORY = 255;
   localparam CATEGORIES = 10;
-  localparam BITS_PER_CATEGORY = 255;
-  // localparam BITS_PER_CATEGORY = 127;
-  // localparam OUTPUTS = BITS_PER_CATEGORY * CATEGORIES;
+  localparam OUTPUTS = BITS_PER_CATEGORY * CATEGORIES;
   localparam BITS_PER_CATEGORY_SUM = $clog2(BITS_PER_CATEGORY);
   always @(posedge clk) begin : set_inputs
     if (write_enable)
