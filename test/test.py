@@ -93,7 +93,8 @@ X = \
 # Y =   "../src/20250924-180044_binTestAcc9508_seed552698_epochs30_8x1270_b256_lr30_interconnect.npz"
 # Y =   "../src/20250924-171017_binTestAcc9521_seed796890_epochs30_8x1270_b256_lr30_interconnect.npz"
 # Y =   "../src/20250924-190954_binTestAcc9638_seed415565_epochs30_1x1270_b256_lr30_interconnect.npz"
-Y =    "../src/20250924-191801_binTestAcc9515_seed400564_epochs30_2x1270_b256_lr30_interconnect.npz"
+# Y =   "../src/20250924-191801_binTestAcc9515_seed400564_epochs30_2x1270_b256_lr30_interconnect.npz"
+Y = "../src/20250924-181913_binTestAcc9577_seed702803_epochs30_8x1270_b256_lr30_interconnect.npz"
 
 ############################## TEST NETS
 # Y = \
