@@ -28,8 +28,11 @@ ASSUME_CIRCULAR_LAYOUT_FOR_CONNECTION_LENGTH = True
 NEED_TO_PACK_STRIDED_OUTPUTS_INTO_CATEGORIES = False
 
 NUMBER_OF_CATEGORIES = 10
+OUTPUT_BITS_PER_CATEGORY = -1
 # OUTPUT_BITS_PER_CATEGORY = 127
-OUTPUT_BITS_PER_CATEGORY = 255
+# OUTPUT_BITS_PER_CATEGORY = 255
+# OUTPUT_BITS_PER_CATEGORY = 800
+# OUTPUT_BITS_PER_CATEGORY = 1600
 
 def op(gate_type, A, B):
     return [
@@ -120,6 +123,8 @@ def generate_verilog(global_inputs, gates, conn_a, conn_b, number_of_categories=
 
     if number_of_categories > 0:
         body += f"    // Arrange outputs in categories ================================================\n"
+        if output_bits_per_category < 0:
+            output_bits_per_category = global_outputs // number_of_categories
         if NEED_TO_PACK_STRIDED_OUTPUTS_INTO_CATEGORIES:
             out_wires_per_category = global_outputs // number_of_categories
             for i in range(number_of_categories):
