@@ -35,22 +35,36 @@ def pth_to_npz(checkpoint):
         w = {}
         indices = {}
         for key in checkpoint.keys():
+            # Supported tensor name format: *.layers.[0..9].{c, w, indices, top_c, top_indices}
             parts = key.split('.')
-            if len(parts) != 3 or parts[0] != 'layers':
+            while len(parts) > 3:
+                if parts[0] != 'layers':
+                    parts.pop(0) # Truncate the front until we reach 'layers' in the name
+            if len(parts) != 3:
                 continue  # Skip tensors that don't contain layer parameters
             layer_id, type = int(parts[1]), parts[2]
-            # print(layer_id)
             
             value = checkpoint[key]
-            if type == 'c':
-                # print(value.shape, torch.argmax(value, dim=0).shape, torch.argmax(value, dim=1).shape)
+            if   type == 'c'    or \
+                 type == 'top_c':
                 c[layer_id] = torch.argmax(value, dim=0)
             elif type == 'w':
                 w[layer_id] = value
-            elif type == 'indices':
+            elif type == 'indices'    or \
+                 type == 'top_indices':
                 indices[layer_id] = value
 
-        # print(len(c), len(w), len(indices))
+
+        # When both `c` and `indices` are present for the same layer
+        # we have to remap indices = indices[c[:], :]
+        for layer_id in indices.keys():
+            if layer_id in c:
+                top_c = c[layer_id]
+                top_i = indices[layer_id]
+                assert top_c.shape[0] == top_i.shape[1]
+                assert top_c.max() < top_i.shape[0]
+                indices[layer_id] = top_i.gather(0, top_c.unsqueeze(0)).squeeze(0)
+                c.pop(layer_id, {})
 
         layers = [v for key, v in sorted(w.items(), key=lambda item: item[0])]
         connections = {**c, **indices}
