@@ -4,9 +4,9 @@
 # World smallest written digit classificastion ASIC using Logic Gate Networks
 
 ASIC implementation for [LILogic Net: Compact Logic Gate Networks with Learnable Connectivity for Efficient Hardware Deployment](https://arxiv.org/abs/2511.12340) paper.
-- 10K logic gates
-- 97.60% test accuracy
-- 100 ns latency
+- `10K` logic gates, `0.8mm x 0.4mm` die area
+- `97.60%` test accuracy
+- `100 ns` inference latency
 
 Tapeouts:
 - SKY130 [SkyWater Technology Foundry's 130nm node](https://github.com/google/skywater-pdk)
@@ -88,7 +88,7 @@ Tests run for a couple of minutes, expected output in the console:
 
 ## Harden locally
 
-NOTE: Tiny Tapeout's [GitHub Actions](https://github.com/rejunity/tt10-lgn-mnist/actions) will *automatically* harden the design and prepare GDS every time the new changes are committed to the repository.
+NOTE: Tiny Tapeout's [GitHub Actions](actions) will *automatically* harden the design and prepare GDS every time the new changes are committed to the repository.
 
 To harden locally read about the setup:
 https://www.tinytapeout.com/guides/local-hardening/
