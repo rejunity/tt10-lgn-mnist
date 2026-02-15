@@ -31,9 +31,11 @@ def pth_to_npz(checkpoint):
         connections = checkpoint.pop("connections")
         layers = [checkpoint[f"layers.{i}.w"] for i in range(len([k for k in checkpoint if k.startswith('layers.') and k.endswith('.w')]))]
     else:
-        c = {}
         w = {}
+        c = {}
         indices = {}
+        top_c = {}
+        top_i = {}
         for key in checkpoint.keys():
             # Supported tensor name format: *.layers.[0..9].{c, w, indices, top_c, top_indices}
             parts = key.split('.')
@@ -45,25 +47,42 @@ def pth_to_npz(checkpoint):
             layer_id, type = int(parts[1]), parts[2]
             
             value = checkpoint[key]
-            if   type == 'c'    or \
-                 type == 'top_c':
-                c[layer_id] = torch.argmax(value, dim=0)
-            elif type == 'w':
+            if   type == 'w':
                 w[layer_id] = value
-            elif type == 'indices'    or \
-                 type == 'top_indices':
+            elif type == 'c':
+                c[layer_id]     = torch.argmax(value, dim=0)
+            elif type == 'top_c':
+                top_c[layer_id] = torch.argmax(value, dim=0)
+            elif type == 'indices':
                 indices[layer_id] = value
+            elif type == 'top_indices':
+                top_i[layer_id] = value
 
+        # When both `top_indices` are present for the same layer, `top_c` is required:
+        # 1) remap top_indices[top_c[:], :]
+        # 2) store into `indices`
+        # 3) remove `top_indices` and `top_c`
+        for layer_id in top_i.keys():
+            assert(layer_id in top_c) # requires both `top_c` and `top_indices`
+            t_c = top_c[layer_id]
+            t_i = top_i[layer_id]
+            assert t_c.shape[0] == t_i.shape[1]
+            assert t_c.max()     < t_i.shape[0]
+            remapped_indices = t_i.gather(0, t_c.unsqueeze(0)).squeeze(0)
+            top_c.pop(layer_id, {})
 
-        # When both `c` and `indices` are present for the same layer
-        # we have to remap indices = indices[c[:], :]
+            if layer_id in indices: # if `indices` already present
+                                    # validate it matches the newly remapped one
+                assert indices[layer_id].shape == remapped_indices.shape
+                assert torch.all(indices[layer_id] == remapped_indices)
+            indices[layer_id] = remapped_indices
+
+        # When both `c` and `indices` are present for the same layer:
+        # 1) validate indices == c
+        # 2) remove redundant c
         for layer_id in indices.keys():
             if layer_id in c:
-                top_c = c[layer_id]
-                top_i = indices[layer_id]
-                assert top_c.shape[0] == top_i.shape[1]
-                assert top_c.max() < top_i.shape[0]
-                indices[layer_id] = top_i.gather(0, top_c.unsqueeze(0)).squeeze(0)
+                assert torch.all(indices[layer_id] == c[layer_id])
                 c.pop(layer_id, {})
 
         layers = [v for key, v in sorted(w.items(), key=lambda item: item[0])]
