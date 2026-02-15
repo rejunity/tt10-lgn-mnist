@@ -88,7 +88,7 @@ Tests run for a couple of minutes, expected output in the console:
 
 ## Harden locally
 
-NOTE: Tiny Tapeout's [GitHub Actions](actions) will *automatically* harden the design and prepare GDS every time the new changes are committed to the repository.
+NOTE: Tiny Tapeout's [GitHub Actions](https://github.com/rejunity/tt10-lgn-mnist/actions) will *automatically* harden the design and prepare GDS every time the new changes are committed to the repository.
 
 To harden locally read about the setup:
 https://www.tinytapeout.com/guides/local-hardening/
