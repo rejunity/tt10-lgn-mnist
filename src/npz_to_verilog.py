@@ -28,6 +28,8 @@ OUTPUT_BITS_PER_CATEGORY = -1
 # OUTPUT_BITS_PER_CATEGORY = 800
 # OUTPUT_BITS_PER_CATEGORY = 1600
 
+#... Verilog gen ..........................................................................
+
 def op(gate_type, A, B):
     return [
         f"1'b0",
@@ -47,12 +49,6 @@ def op(gate_type, A, B):
         f"~({A} & {B})",
         f"1'b1"
     ][gate_type]
-
-def get_conn_distance(conn_a, conn_b, in_count):
-    d = np.abs(conn_a - conn_b)
-    if ASSUME_CIRCULAR_LAYOUT_FOR_CONNECTION_LENGTH:
-        d[d > in_count // 2] = in_count - d[d > in_count // 2]
-    return d
 
 def generate_verilog(global_inputs, gates, conn_a, conn_b, number_of_categories=NUMBER_OF_CATEGORIES, output_bits_per_category=OUTPUT_BITS_PER_CATEGORY):
     assert len(gates) == len(conn_a) == len(conn_b)
@@ -116,6 +112,8 @@ module net (
 {body}
 endmodule
 """
+
+#... Misc utilities .......................................................................
 
 def ascii_graph(values):
     # Array of characters for tiny histograms
@@ -197,6 +195,12 @@ def npz_to_verilog(data, max_layers=-1):
             gates[i] = choice[r]
     except:
         pass
+
+    def get_conn_distance(conn_a, conn_b, in_count):
+        d = np.abs(conn_a - conn_b)
+        if ASSUME_CIRCULAR_LAYOUT_FOR_CONNECTION_LENGTH:
+            d[d > in_count // 2] = in_count - d[d > in_count // 2]
+        return d
 
     def wire_stats(conn_a, conn_b, in_count):
         d = get_conn_distance(conn_a, conn_b, in_count)
