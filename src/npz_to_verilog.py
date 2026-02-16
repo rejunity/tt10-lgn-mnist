@@ -5,16 +5,10 @@ from collections.abc import Sequence, Mapping
 
 # DONE: Inject additional pass-through (negate / or) gates on the long connections.
 #       Use keep directive to avoid optimisastion by Yosys.
+#       Predict wire length
 
 # TODO: * %Warning-UNUSEDSIGNAL / predict gate count
-#       * Fanout historgram
-#       * Predict wire length 
-
-EXPANDED_VERILOG = False
-# EXPANDED_VERILOG = True
-
-RELAY_LONG_CONNECTIONS = False
-# RELAY_LONG_CONNECTIONS = 64
+#       * Fanout histogram
 
 LIMIT_LONG_CONNECTIONS = False
 # LIMIT_LONG_CONNECTIONS = 128
@@ -86,40 +80,12 @@ def generate_verilog(global_inputs, gates, conn_a, conn_b, number_of_categories=
         def setup_inputs(body, layer_idx, gate_idx, a, b):
             input_a = f"{input}[{a}]"
             input_b = f"{input}[{b}]"
-            if RELAY_LONG_CONNECTIONS > 0:
-                in_count = len(gates[layer_idx-1]) if layer_idx > 0 else global_inputs
-                relay_count = get_conn_distance(a, b, in_count) // RELAY_LONG_CONNECTIONS
-                for n in range(relay_count):
-                    relay = f"far_{layer_idx}_{gate_idx}_{n}"
-                    # body += f"    wire [1:0] {relay};"
-                    # body += f"    relay_conn {relay}_a(.in({input_a}), .out({relay}[0]));"
-                    # body += f"    relay_conn {relay}_b(.in({input_b}), .out({relay}[1]));"
-                    # body += "\n"
-                    # input_a = f"{relay}[0]"
-                    # input_b = f"{relay}[1]"
-
-                    body += f"    wire {relay};"
-                    body += f"    relay_conn {relay}_b(.in({input_b}), .out({relay}));"
-                    body += "\n"
-                    input_b = f"{relay}"
-
             return body, input_a, input_b
 
-        if EXPANDED_VERILOG:
-            for out_idx, gate, a, b in zip(range(len(layer_gates)), layer_gates, layer_conn_a, layer_conn_b):
-                body, input_a, input_b = setup_inputs(body, layer_idx, gate_idx, a, b)
-                body += f"    logic_gate gate_{layer_idx}_{gate_idx} ("
-                body += f"        .A({input_a}),"
-                body += f"        .B({input_b}),"
-                body += f"        .gate_type(4'd{gate}),"
-                body += f"        .Y({output}[{out_idx}])"
-                body += f"    );\n"
-                gate_idx += 1
-        else:
-            for out_idx, gate, a, b in zip(range(len(layer_gates)), layer_gates, layer_conn_a, layer_conn_b):
-                body, input_a, input_b = setup_inputs(body, layer_idx, gate_idx, a, b)
-                body += f"    assign {output}[{out_idx}] = {op(gate, f'{input_a}', f'{input_b}')}; \n"
-                gate_idx += 1
+        for out_idx, gate, a, b in zip(range(len(layer_gates)), layer_gates, layer_conn_a, layer_conn_b):
+            body, input_a, input_b = setup_inputs(body, layer_idx, gate_idx, a, b)
+            body += f"    assign {output}[{out_idx}] = {op(gate, f'{input_a}', f'{input_b}')}; \n"
+            gate_idx += 1
 
     if number_of_categories > 0:
         body += f"    // Arrange outputs in categories ================================================\n"
@@ -140,62 +106,7 @@ def generate_verilog(global_inputs, gates, conn_a, conn_b, number_of_categories=
         else:
             body += f"    assign categories[{output_bits_per_category*number_of_categories-1}:0] = out[{output_bits_per_category*number_of_categories-1}:0];\n"
 
-    verilog = ""
-    if RELAY_LONG_CONNECTIONS > 0:
-        verilog += f"""
-`ifdef SIM
-module sky130_fd_sc_hd__inv_1 (
-    input wire A,
-    output wire Y
-);
-    assign Y = ~A;
-endmodule
-`endif
-module relay_conn (
-    input wire in,
-    output wire out
-);
-    wire tmp;
-    /* verilator lint_off PINMISSING */
-    // https://skywater-pdk.readthedocs.io/en/main/contents/libraries/sky130_fd_sc_hd/cells/inv/README.html
-    (* keep = "true" *) sky130_fd_sc_hd__inv_1 inv_a ( .Y(tmp), .A(in)  );
-    // (* keep = "true" *) sky130_fd_sc_hd__inv_1 inv_b ( .Y(out), .A(tmp) );
-    assign out = ~tmp; // allow the second inverter to be optimized
-    /* verilator lint_on PINMISSING */
-endmodule """
-
-    if EXPANDED_VERILOG:
-        verilog += f"""
-module logic_gate (
-    input wire A,
-    input wire B,
-    input wire [3:0] gate_type,  // 4-bit gate type identifier
-    output reg Y
-);
-    always @(*) begin
-        case (gate_type)
-            4'd0:  Y = 0;                          // g0:  0
-            4'd1:  Y = A & B;                      // g1:  A * B
-            4'd2:  Y = A & ~B;                     // g2:  A - A * B
-            4'd3:  Y = A;                          // g3:  A
-            4'd4:  Y = B & ~A;                     // g4:  B - A * B
-            4'd5:  Y = B;                          // g5:  B
-            4'd6:  Y = A ^ B;                      // g6:  A + B - 2 * A * B
-            4'd7:  Y = A | B;                      // g7:  A + B - A * B
-            4'd8:  Y = ~(A | B);                   // g8:  1 - (A + B - A * B)
-            4'd9:  Y = ~(A ^ B);                   // g9:  1 - (A + B - 2 * A * B)
-            4'd10: Y = ~B;                         // g10: 1 - B
-            4'd11: Y = ~B | (A & B);               // g11: 1 - B + A * B
-            4'd12: Y = ~A;                         // g12: 1 - A
-            4'd13: Y = ~A | (A & B);               // g13: 1 - A + A * B
-            4'd14: Y = ~(A & B);                   // g14: 1 - A * B
-            4'd15: Y = 1;                          // g15: 1
-            default: Y = 0;                        // Default case
-        endcase
-    end
-endmodule """
-    else:
-        verilog += f"""
+    return f"""
 module net (
     input  wire [{ global_inputs-1}:0] in,
     output wire [{global_outputs-1}:0] out{"," if number_of_categories > 0 else ""}
@@ -205,7 +116,6 @@ module net (
 {body}
 endmodule
 """
-    return verilog
 
 def ascii_graph(values):
     # Array of characters for tiny histograms
@@ -223,13 +133,9 @@ def ascii_histogram(values, size=16):
     counts = np.zeros(size, dtype=int)
     for v in range(size):
         counts[v] = len(values[values == v])
-    # unique, counts_vals = np.unique(values, return_counts=True)
-    # counts[unique] = counts_vals
     return ascii_graph(counts)
 
 def ascii_histogram_compressed(values, bins=8):
-    # values = np.hstack([values, 0, 1])
-    # values[values >= np.mean(values) * 2] = np.mean(values) * 2
     if bins > np.max(values):
         bins = np.max(values) + 1
     counts, _ = np.histogram(values, bins=bins)
