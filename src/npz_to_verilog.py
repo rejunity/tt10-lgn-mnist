@@ -10,7 +10,7 @@ from collections.abc import Sequence, Mapping
 # TODO: * %Warning-UNUSEDSIGNAL / predict gate count
 #       * Fanout histogram
 
-GENERATE_TESTBENCH = True
+GENERATE_TESTBENCH_DATA = True
 
 LIMIT_LONG_CONNECTIONS = False
 # LIMIT_LONG_CONNECTIONS = 128
@@ -115,18 +115,17 @@ module net (
 endmodule
 """
 
-def generate_verilog_testbench(testdata_input, testdata_output, modulename="net"):
+def generate_verilog_testdata(testdata_input, testdata_output, modulename="net"):
     X = testdata_input
     Y = testdata_output
 
     if X.shape[0] != Y.shape[0]:
         raise ValueError(f"input samples {X.shape[0]} != output samples {Y.shape[0]}")
 
-    n = min(64, X.shape[0])
+    MAX_INPUT_SAMPLES = 64 # limit to 64 input samples for speed
+    n = min(MAX_INPUT_SAMPLES, X.shape[0])
     in_w = X.shape[1]
     out_w = Y.shape[1]
-
-    delay = 1
 
     init_block = ""
     def array_to_bin(arr):
@@ -139,39 +138,15 @@ def generate_verilog_testbench(testdata_input, testdata_output, modulename="net"
     return f"""
 `default_nettype none
 `timescale 1ns/1ps
-module {modulename}_tb;
-  reg  [{in_w -1}:0] in;
-  wire [{out_w-1}:0] out;
-
-  {modulename} dut(
-    .in(in),
-    .out(out)
-  );
-  
-  localparam integer N = {n};
-  reg  [{in_w -1}:0] X [0:N-1];
-  reg  [{out_w-1}:0] Y [0:N-1];
-  
+`define TESTDATA_N {n}
+`define TESTDATA_X {in_w}
+`define TESTDATA_Y {out_w}
+module {modulename}_testdata;
+  parameter N = `TESTDATA_N;
+  reg  [(`TESTDATA_X)-1:0] X [0:(`TESTDATA_N)-1];
+  reg  [(`TESTDATA_Y)-1:0] Y [0:(`TESTDATA_N)-1];  
   initial begin
 {init_block}
-  end
-  
-  integer i;
-  initial begin
-    $display(\"Running %0d vectors...\", N);
-    for (i = 0; i < N; i = i + 1) begin
-      in = X[i];
-       #{delay};
-      if (out !== Y[i]) begin
-        $display(\"FAIL at i=%0d\", i);
-        $display(\"  in  = %b\", in);
-        $display(\"  exp = %b\", Y[i]);
-        $display(\"  got = %b\", out);
-        $finish(1);
-      end
-    end
-    $display(\"ALL TESTS PASSED.\");
-    $finish;
   end
 endmodule
 """
@@ -372,10 +347,10 @@ if __name__ == "__main__":
     print(f"Verilog code has been generated and saved to '{verilog_file_name}'.")
 
 
-    if GENERATE_TESTBENCH and "input" in data and "output" in data:
-        testbench_file_name = verilog_file_name[:-2] + "_tb.v"
+    if GENERATE_TESTBENCH_DATA and "input" in data and "output" in data:
+        testbench_file_name = verilog_file_name[:-2] + "_testdata.v"
         testbench = f"// Generated from: {npz_file_name}\n" + \
-            generate_verilog_testbench(data["input"], data["output"])
+            generate_verilog_testdata(data["input"], data["output"])
         save_verilog_file(testbench_file_name, testbench)
         print(f"Testbench has been generated and saved to '{testbench_file_name}'.")
 
