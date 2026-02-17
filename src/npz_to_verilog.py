@@ -137,6 +137,7 @@ def generate_verilog_testbench(testdata_input, testdata_output, modulename="net"
         init_block += f"    Y[{i}] = {out_w}'b{array_to_bin(Y[i][::-1])};\n"
 
     return f"""
+`default_nettype none
 `timescale 1ns/1ps
 module {modulename}_tb;
   reg  [{in_w -1}:0] in;
@@ -166,7 +167,7 @@ module {modulename}_tb;
         $display(\"  in  = %b\", in);
         $display(\"  exp = %b\", Y[i]);
         $display(\"  got = %b\", out);
-        $stop -N;
+        $finish(1);
       end
     end
     $display(\"ALL TESTS PASSED.\");
