@@ -233,7 +233,7 @@ module project_tb;
     alt = 1'b0;
 
     // Only first 8 samples (like cocotb)
-    for (s = 0; s < testdata.N; s = s + 1) begin
+    for (s = 0; s < $min(8, testdata.N); s = s + 1) begin
       $display("---- Sample %0d ----", s);
 
       $display("Clear input buffer, 256 bits");
