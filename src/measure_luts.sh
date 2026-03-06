@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -ex
 
-PTH=/Users/rej/Dev/TinyTapeout/TrainableLogicGateNetworks.my.git/__paper2_pth/
+# PTH=/Users/rej/Dev/TinyTapeout/TrainableLogicGateNetworks.my.git/__paper2_pth/
+PTH=../__paper2_pth/
 LUTN=4
 XILINX_FPGA=~/nextpnr-xilinx/xilinx/xc7a35t.bin
 
