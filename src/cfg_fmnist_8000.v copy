@@ -1,0 +1,3 @@
+
+`define GLOBAL_INPUTS 28*28*7
+`define GLOBAL_OUTPUTS 8000
