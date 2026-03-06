@@ -92,8 +92,18 @@ module tt_um_rejunity_lgn_mnist (
     .out_value(best_category_value)
   );
 
-  assign  uo_out[7:0] = best_category_value[7:0];
-  assign uio_out[3:0] = best_category_index[3:0];
+
+  reg [3:0] best_category_index_;
+  reg [7:0] best_category_value_;
+
+  always @(posedge clk) begin : reg_outputs
+    best_category_index_ <= best_category_index;
+    best_category_value_ <= best_category_value;
+  end
+
+
+  assign  uo_out[7:0] = best_category_value_[7:0];
+  assign uio_out[3:0] = best_category_index_[3:0];
   assign uio_out[6:4] = 0;
   assign uio_out[7]   = 0;
 
