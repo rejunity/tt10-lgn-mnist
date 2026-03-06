@@ -22,11 +22,10 @@ module tt_um_rejunity_lgn_mnist (
   // List all unused inputs to prevent warnings
   wire _unused = &{ena, rst_n, 1'b0};
 
-  localparam INPUTS  = 256;
-  localparam OUTPUTS = 2550;
+  localparam INPUTS  = `GLOBAL_INPUTS;
+  localparam OUTPUTS = `GLOBAL_OUTPUTS;
   localparam CATEGORIES = 10;
-  localparam BITS_PER_CATEGORY = 255;
-  // localparam BITS_PER_CATEGORY = 127;
+  localparam BITS_PER_CATEGORY = OUTPUTS / CATEGORIES;
   // localparam OUTPUTS = BITS_PER_CATEGORY * CATEGORIES;
   localparam BITS_PER_CATEGORY_SUM = $clog2(BITS_PER_CATEGORY);
   always @(posedge clk) begin : set_inputs
@@ -47,15 +46,35 @@ module tt_um_rejunity_lgn_mnist (
   genvar i;
   generate
     for (i = 0; i < CATEGORIES; i = i+1) begin : calc_categories
-      // sum_bits #(.N(BITS_PER_CATEGORY)) sum_bits(
-      //   .y(y_categories[i*BITS_PER_CATEGORY +: BITS_PER_CATEGORY]),      
+      // assign sum_categories[i*BITS_PER_CATEGORY_SUM +: BITS_PER_CATEGORY_SUM] =
+      //   $countones(y_categories[i*BITS_PER_CATEGORY +: BITS_PER_CATEGORY]);
+    
+    `ifdef COUNT_BITS
+      count_bits #(.N(BITS_PER_CATEGORY)) count_bits(
+        .y(y_categories[i*BITS_PER_CATEGORY +: BITS_PER_CATEGORY]),      
+        .sum(sum_categories[i*BITS_PER_CATEGORY_SUM +: BITS_PER_CATEGORY_SUM])
+      );
+    `else 
+      sum_bits #(.N(BITS_PER_CATEGORY)) sum_bits(
+        .y(y_categories[i*BITS_PER_CATEGORY +: BITS_PER_CATEGORY]),      
+        .sum(sum_categories[i*BITS_PER_CATEGORY_SUM +: BITS_PER_CATEGORY_SUM])
+      );
+    `endif
+
+      // sum_511_bits sum_bits(
+      //   .y(y_categories[i*BITS_PER_CATEGORY +: BITS_PER_CATEGORY]),
+      //   .sum(sum_categories[i*BITS_PER_CATEGORY_SUM +: BITS_PER_CATEGORY_SUM])
+      // );
+
+      // sum_399_bits sum_bits(
+      //   .y(y_categories[i*BITS_PER_CATEGORY +: BITS_PER_CATEGORY]),
       //   .sum(sum_categories[i*BITS_PER_CATEGORY_SUM +: BITS_PER_CATEGORY_SUM])
       // );
       
-      sum_255_bits sum_bits(
-        .y(y_categories[i*BITS_PER_CATEGORY +: BITS_PER_CATEGORY]),
-        .sum(sum_categories[i*BITS_PER_CATEGORY_SUM +: BITS_PER_CATEGORY_SUM])
-      );
+      // sum_255_bits sum_bits(
+      //   .y(y_categories[i*BITS_PER_CATEGORY +: BITS_PER_CATEGORY]),
+      //   .sum(sum_categories[i*BITS_PER_CATEGORY_SUM +: BITS_PER_CATEGORY_SUM])
+      // );
 
       // sum_127_bits sum_bits(
       //   .y(y_categories[i*BITS_PER_CATEGORY +: BITS_PER_CATEGORY]),
@@ -73,22 +92,22 @@ module tt_um_rejunity_lgn_mnist (
     .out_value(best_category_value)
   );
 
-  // assign  uo_out[7:0] = best_category_value[7:0];
-  // assign uio_out[3:0] = best_category_index[3:0];
-  // assign uio_out[6:4] = 0;
-  // assign uio_out[7]   = 0;
-
-  wire [6:0] display;
-  seven_segment seven_segment(
-    .in(best_category_index[3:0]),
-    .out(display)
-  );
-
-  // assign  uo_out[3:0] = best_category_index[3:0]; assign  uo_out[6:4] = 0;
-  assign  uo_out[6:0] = display;
-  assign  uo_out[7] = ~write_enable;
-  assign uio_out[6:0] = best_category_value[1 +: 7];
+  assign  uo_out[7:0] = best_category_value[7:0];
+  assign uio_out[3:0] = best_category_index[3:0];
+  assign uio_out[6:4] = 0;
   assign uio_out[7]   = 0;
+
+  // wire [6:0] display;
+  // seven_segment seven_segment(
+  //   .in(best_category_index[3:0]),
+  //   .out(display)
+  // );
+
+  // // assign  uo_out[3:0] = best_category_index[3:0]; assign  uo_out[6:4] = 0;
+  // assign  uo_out[6:0] = display;
+  // assign  uo_out[7] = ~write_enable;
+  // assign uio_out[6:0] = best_category_value[1 +: 7];
+  // assign uio_out[7]   = 0;
 
 
 endmodule
@@ -112,33 +131,55 @@ module sum_bits #(
     assign sum = temp_sum;
 endmodule
 
-module sum_511_bits (
-    input wire [512-1:0] y,
-    output wire  [9-1:0] sum
+module count_bits #(
+    parameter N = 16
+) (
+    input wire [N-1:0] y,
+    output wire [$clog2(N)-1:0] sum
 );
-    wire [7:0] count0;
-    wire [7:0] count1;
-    PopCount256 popcount0(.data(y[0*256 +: 256]), .count(count0));
-    PopCount256 popcount1(.data(y[1*256 +: 256]), .count(count1));
-    wire unused_msb;
-    assign {unused_msb, sum} = count0 + count1;
+    assign sum = $countones(y);
 endmodule
 
-module sum_255_bits (
-    input wire [255-1:0] y,
-    output wire  [8-1:0] sum
-);
-    wire unused_msb;
-    PopCount256 popcount256(.data({1'b0, y}), .count({unused_msb, sum}));
-endmodule
 
-module sum_127_bits (
-    input wire [127-1:0] y,
-    output wire  [7-1:0] sum
-);
-    wire unused_msb;
-    PopCount128 popcount128(.data({1'b0, y}), .count({unused_msb, sum}));
-endmodule
+// module sum_399_bits (
+//     input wire [400-1:0] y,
+//     output wire  [9-1:0] sum
+// );
+//     wire [7:0] count0;
+//     wire [6:0] count1;
+//     PopCount256 popcount0(.data(y[0*256 +: 256]), .count(count0));
+//     PopCount128 popcount1(.data(y[1*256 +: 128]), .count(count1));
+//     wire unused_msb;
+//     assign {unused_msb, sum} = count0 + count1 + $countones(y[256+128 +: 16]);
+// endmodule
+
+// module sum_511_bits (
+//     input wire [512-1:0] y,
+//     output wire  [9-1:0] sum
+// );
+//     wire [7:0] count0;
+//     wire [7:0] count1;
+//     PopCount256 popcount0(.data(y[0*256 +: 256]), .count(count0));
+//     PopCount256 popcount1(.data(y[1*256 +: 256]), .count(count1));
+//     wire unused_msb;
+//     assign {unused_msb, sum} = count0 + count1;
+// endmodule
+
+// module sum_255_bits (
+//     input wire [255-1:0] y,
+//     output wire  [8-1:0] sum
+// );
+//     wire unused_msb;
+//     PopCount256 popcount256(.data({1'b0, y}), .count({unused_msb, sum}));
+// endmodule
+
+// module sum_127_bits (
+//     input wire [127-1:0] y,
+//     output wire  [7-1:0] sum
+// );
+//     wire unused_msb;
+//     PopCount128 popcount128(.data({1'b0, y}), .count({unused_msb, sum}));
+// endmodule
 
 module arg_max_10 #(
     parameter N = 8
@@ -220,26 +261,26 @@ endmodule
 //      5 | 4 | 3
 //         ---
 
-module seven_segment (
-    input  wire [3:0] in,
-    output reg  [6:0] out
-);
-    always @(*) begin
-        case(in)
-            //          .7654321
-            0:  out = 7'b0111111;
-            1:  out = 7'b0000110;
-            2:  out = 7'b1011011;
-            3:  out = 7'b1001111;
-            4:  out = 7'b1100110;
-            5:  out = 7'b1101101;
-            6:  out = 7'b1111100;
-            7:  out = 7'b0000111;
-            8:  out = 7'b1111111;
-            9:  out = 7'b1100111;
-            default:
-                out = 7'b0000000;
-        endcase
-    end
-endmodule
+// module seven_segment (
+//     input  wire [3:0] in,
+//     output reg  [6:0] out
+// );
+//     always @(*) begin
+//         case(in)
+//             //          .7654321
+//             0:  out = 7'b0111111;
+//             1:  out = 7'b0000110;
+//             2:  out = 7'b1011011;
+//             3:  out = 7'b1001111;
+//             4:  out = 7'b1100110;
+//             5:  out = 7'b1101101;
+//             6:  out = 7'b1111100;
+//             7:  out = 7'b0000111;
+//             8:  out = 7'b1111111;
+//             9:  out = 7'b1100111;
+//             default:
+//                 out = 7'b0000000;
+//         endcase
+//     end
+// endmodule
 
