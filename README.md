@@ -9,11 +9,15 @@ ASIC implementation for [LILogic Net: Compact Logic Gate Networks with Learnable
 - `100 ns` inference latency
 
 Tapeouts:
+- SkyWater Technology Foundry's 130nm node, [SKY130 PDK](https://github.com/google/skywater-pdk) -- [Tiny Tapeout SKY 25a chip project #72](https://tinytapeout.com/chips/ttsky25a/tt_um_rejunity_lgn_mnist), [chip 3D view](https://gds-viewer.tinytapeout.com/?model=https%3A%2F%2Fshuttle-assets.tinytapeout.com%2Fttsky25a%2Ftt_um_rejunity_lgn_mnist%2Ftt_um_rejunity_lgn_mnist.oas&pdk=sky130A)
+- IHP Foundry's BiCMOS 130nm node [SG13 PDK](https://github.com/IHP-GmbH/IHP-Open-PDK) -- [Tiny Tapeout IHP 25b chip project #336](https://tinytapeout.com/chips/ttihp25b/tt_um_rejunity_lgn_mnist), [chip 3D view](https://gds-viewer.tinytapeout.com/?model=https%3A%2F%2Fshuttle-assets.tinytapeout.com%2Fttihp25b%2Ftt_um_rejunity_lgn_mnist%2Ftt_um_rejunity_lgn_mnist.oas&pdk=ihp-sg13g2)
+- Global Foundry's 180nm node [GF180 PDK](https://github.com/google/gf180mcu-pdk) -- [tapeout repo](https://gitlab.com/rejunity/ws0-lgn-fxnist-gf180mcu-tapeout/-/tree/main), [GDS file](https://gitlab.com/rejunity/ws0-lgn-fxnist-gf180mcu-tapeout/-/blob/main/chip_top.gds?ref_type=heads)
+- **Coming soon** TSMC65 65nm node
+
+Tested with open-source PDKs:
 - SKY130 [SkyWater Technology Foundry's 130nm node](https://github.com/google/skywater-pdk)
 - SG13 [IHP Foundry's BiCMOS 130nm node](https://github.com/IHP-GmbH/IHP-Open-PDK)
 - GF180 [Global Foundry's 180nm node](https://github.com/google/gf180mcu-pdk)
-- **Coming soon** TSMC65 65nm node
-
 
 ## Setup
 
